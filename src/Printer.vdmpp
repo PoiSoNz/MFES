@@ -1,0 +1,46 @@
+class Printer
+
+	instance variables
+		private id: nat;
+		private inkQuantities: seq1 of nat := [0, 0]; -- [black&white, color]
+		private paperQuantities: seq1 of nat := [0, 0, 0, 0]; -- [A3, A4, A5, A6]
+		private printingQueue: seq of Document := [];
+		private openReports: seq of Report := [];
+		private damaged: bool := false;
+		private location: char;
+
+		inv len inkQuantities = 2 and 
+				len paperQuantities = 4;
+
+	operations
+		public Printer: nat * seq1 of nat * seq1 of nat * char ==> Printer
+		Printer(id_, inkQuantities_, paperQuantities_, location_) ==
+		(
+			id := id_;
+			inkQuantities := inkQuantities_;
+			paperQuantities := paperQuantities_;
+			location := location_;
+			return self
+		)	
+			post 
+				printingQueue = [] and
+				openReports = [] and
+				damaged = false;
+				
+		-- CODE FROM MOODLE STACK EXAMPLE
+ --public clear: () ==> ()
+ --clear() == contents := [];
+ --public push: int ==> ()
+ --push(x) == contents := [x] ^ contents
+ --pre len contents < capacity
+ --post contents = [x] ^ contents~;
+ --public pop: () ==> ()
+ --pop() == contents := tl contents
+ --pre contents <> []
+ --post contents = tl contents~;
+ --public top: () ==> int
+ --top() == return hd contents
+ --pre contents <> []
+ --post RESULT = hd contents;
+ 
+end Printer
