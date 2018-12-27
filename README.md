@@ -5,4 +5,10 @@
 - Payment with balance
 - Printers placed in different places/clients
 - solve malfunctions reported / send employees to fix those
-- Reports with several metrics, etc. 
+- Reports with several metrics, etc.
+
+
+
+# UML class diagram
+
+![UML diagram](https://imgur.com/jXrrDmK.png)
