@@ -1,0 +1,73 @@
+class Document
+	
+	types
+		public ColorType = <BlackWhite> | <Color>;
+		public PaperSize = <A3> | <A4> | <A5>;
+		public DocumentStatus = <NotPrinted> | <Queued> | <Printed>; -- A document is considered <NotPrinted> if it hasn't been queued yet
+		
+	instance variables
+		private id: nat;
+		private color: ColorType;
+		private size: PaperSize;
+		private inkQuantity: nat1;
+		private paperQuantity: nat1;
+		private price: real;
+		private status: DocumentStatus := <NotPrinted>;
+		private owner: Client;
+
+		--inv ;
+
+	operations
+		public Document: nat * ColorType * PaperSize * nat1 * nat1 * real * Client ==> Document
+		Document(id_, color_, size_, inkQuantity_, paperQuantity_, price_, owner_) ==
+		(
+			id := id_;
+			color := color_;
+			size := size_;
+			inkQuantity := inkQuantity_;
+			paperQuantity := paperQuantity_;
+			price := calculatePrice(color_, size_, paperQuantity_);
+			status := <NotPrinted>;
+			owner := owner_;
+			return self
+		)	
+			post 
+				price > 0;
+				
+	functions
+		public static calculatePrice: ColorType * PaperSize * nat1 -> real
+		calculatePrice(color, size, paperQuantity) ==
+			sheetCost(size) * paperQuantity * colorCostFactor(color);
+		
+		public static colorCostFactor: ColorType -> real
+		colorCostFactor(color) ==
+			cases color:
+				<BlackWhite> -> 1,
+				<Color> -> 1.5
+			end;
+			
+		public static sheetCost: PaperSize -> real
+		sheetCost(sheetSize) ==
+			cases sheetSize:
+				<A3> -> 0.07,
+				<A4> -> 0.05,
+				<A5> -> 0.03
+			end;
+		
+		-- CODE FROM MOODLE STACK EXAMPLE
+ --public clear: () ==> ()
+ --clear() == contents := [];
+ --public push: int ==> ()
+ --push(x) == contents := [x] ^ contents
+ --pre len contents < capacity
+ --post contents = [x] ^ contents~;
+ --public pop: () ==> ()
+ --pop() == contents := tl contents
+ --pre contents <> []
+ --post contents = tl contents~;
+ --public top: () ==> int
+ --top() == return hd contents
+ --pre contents <> []
+ --post RESULT = hd contents;
+ 
+end Document
