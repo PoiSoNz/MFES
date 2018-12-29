@@ -33,6 +33,7 @@ class Document
 			return self
 		)
 			post
+				id_count = id_count~ + 1 and
 				id = id_count~ and
 				owner = nil and
 				price > 0;

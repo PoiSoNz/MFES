@@ -28,6 +28,7 @@ class Client
 			pre
 				startingMoneyBalance > 0
 			post
+				id_count = id_count~ + 1 and
 				id = id_count~;
 		
 		/*
@@ -43,6 +44,7 @@ class Client
 			return self
 		)
 			post
+				id_count = id_count~ + 1 and
 				id = id_count~ and
 				moneyBalance = 0;
  
