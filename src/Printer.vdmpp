@@ -1,6 +1,7 @@
 class Printer
 
 	instance variables
+		private static id_count: nat := 1;
 		private id: nat;
 		private inkQuantities: seq1 of nat := [0, 0]; -- [black&white, color]
 		private paperQuantities: seq1 of nat := [0, 0, 0, 0]; -- [A3, A4, A5, A6]
@@ -13,16 +14,18 @@ class Printer
 				len paperQuantities = 4;
 
 	operations
-		public Printer: nat * seq1 of nat * seq1 of nat * char ==> Printer
-		Printer(id_, inkQuantities_, paperQuantities_, location_) ==
+		public Printer: seq1 of nat * seq1 of nat * char ==> Printer
+		Printer(inkQuantities_, paperQuantities_, location_) ==
 		(
-			id := id_;
+			id := id_count;
+			id_count := id_count + 1;
 			inkQuantities := inkQuantities_;
 			paperQuantities := paperQuantities_;
 			location := location_;
 			return self
 		)	
 			post 
+				id = id_count~ and
 				printingQueue = [] and
 				openReports = [] and
 				damaged = false;

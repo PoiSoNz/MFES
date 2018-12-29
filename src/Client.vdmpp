@@ -1,0 +1,49 @@
+class Client
+
+	types
+		public String = seq1 of char;
+		
+	instance variables
+		private static id_count: nat := 1;
+		private id: nat;
+		private name: String;
+		private moneyBalance: real := 0;
+		private documents: seq of Document := [];
+
+		--inv ;
+
+	operations
+		/*
+			Create a client providing a positive starting money balance
+		*/
+		public Client: String * real ==> Client
+		Client(name_, startingMoneyBalance) ==
+		(
+			id := id_count;
+			id_count := id_count + 1;
+			name := name_;
+			moneyBalance := startingMoneyBalance;
+			return self
+		)
+			pre
+				startingMoneyBalance > 0
+			post
+				id = id_count~;
+		
+		/*
+			Create a client with no money balance (zero)
+		*/
+		public Client: String ==> Client
+		Client(name_) ==
+		(
+			id := id_count;
+			id_count := id_count + 1;
+			name := name_;
+			moneyBalance := 0;
+			return self
+		)
+			post
+				id = id_count~ and
+				moneyBalance = 0;
+ 
+end Client

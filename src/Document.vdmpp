@@ -6,6 +6,7 @@ class Document
 		public DocumentStatus = <NotPrinted> | <Queued> | <Printed>; -- A document is considered <NotPrinted> if it hasn't been queued yet
 		
 	instance variables
+		private static id_count: nat := 1;
 		private id: nat;
 		private color: ColorType;
 		private size: PaperSize;
@@ -13,26 +14,34 @@ class Document
 		private paperQuantity: nat1;
 		private price: real;
 		private status: DocumentStatus := <NotPrinted>;
-		private owner: Client;
+		private owner: [Client] := nil;
 
 		--inv ;
 
 	operations
-		public Document: nat * ColorType * PaperSize * nat1 * nat1 * real * Client ==> Document
-		Document(id_, color_, size_, inkQuantity_, paperQuantity_, price_, owner_) ==
+		public Document: ColorType * PaperSize * nat1 * nat1 * real ==> Document
+		Document(color_, size_, inkQuantity_, paperQuantity_, price_) ==
 		(
-			id := id_;
+			id := id_count;
+			id_count := id_count + 1;
 			color := color_;
 			size := size_;
 			inkQuantity := inkQuantity_;
 			paperQuantity := paperQuantity_;
 			price := calculatePrice(color_, size_, paperQuantity_);
 			status := <NotPrinted>;
-			owner := owner_;
 			return self
-		)	
-			post 
+		)
+			post
+				id = id_count~ and
+				owner = nil and
 				price > 0;
+				
+		public setOwner: Client ==> ()
+		setOwner(client) ==
+			owner := client
+			post
+				owner <> nil;
 				
 	functions
 		public static calculatePrice: ColorType * PaperSize * nat1 -> real
@@ -53,21 +62,5 @@ class Document
 				<A4> -> 0.05,
 				<A5> -> 0.03
 			end;
-		
-		-- CODE FROM MOODLE STACK EXAMPLE
- --public clear: () ==> ()
- --clear() == contents := [];
- --public push: int ==> ()
- --push(x) == contents := [x] ^ contents
- --pre len contents < capacity
- --post contents = [x] ^ contents~;
- --public pop: () ==> ()
- --pop() == contents := tl contents
- --pre contents <> []
- --post contents = tl contents~;
- --public top: () ==> int
- --top() == return hd contents
- --pre contents <> []
- --post RESULT = hd contents;
  
 end Document
