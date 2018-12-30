@@ -1,0 +1,25 @@
+class Technician
+		
+	instance variables
+		private static id_count: nat := 1;
+		private id: nat;
+		private name: Utils`String;
+		private fixedReports: seq of Report := [];
+
+		--inv ;
+
+	operations
+		public Technician: Utils`String ==> Technician
+		Technician(name_) ==
+		(
+			id := id_count;
+			id_count := id_count + 1;
+			name := name_;
+			return self
+		)
+			post
+				id_count = id_count~ + 1 and
+				id = id_count~ and
+				fixedReports = [];
+ 
+end Technician

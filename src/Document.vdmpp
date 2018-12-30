@@ -19,8 +19,8 @@ class Document
 		--inv ;
 
 	operations
-		public Document: ColorType * PaperSize * nat1 * nat1 * real ==> Document
-		Document(color_, size_, inkQuantity_, paperQuantity_, price_) ==
+		public Document: ColorType * PaperSize * nat1 * nat1 ==> Document
+		Document(color_, size_, inkQuantity_, paperQuantity_) ==
 		(
 			id := id_count;
 			id_count := id_count + 1;

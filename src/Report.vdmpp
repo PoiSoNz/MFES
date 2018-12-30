@@ -1,0 +1,45 @@
+class Report
+	
+	types
+		public MalfunctionType = <Damaged> | <BlackInkEmpty> | <ColorInkEmpty> |
+														<A3Empty> | <A4Empty> | <A5Empty>;
+	
+	instance variables
+		private static id_count: nat := 1;
+		private id: nat;
+		private malfunction: MalfunctionType;
+		private printer: Printer;
+		private technician: [Technician] := nil;
+		private closed: bool := false;
+
+		--inv ;
+
+	operations
+		public Report: MalfunctionType * Printer ==> Report
+		Report(malfunction_, printer_) ==
+		(
+			id := id_count;
+			id_count := id_count + 1;
+			malfunction := malfunction_;
+			printer := printer_;
+			return self
+		)
+			post
+				id_count = id_count~ + 1 and
+				id = id_count~ and
+				technician = nil and
+				closed = false;
+				
+		public setTechnician: Technician ==> ()
+		setTechnician(technician_) ==
+			technician := technician_
+			post
+				technician <> nil;
+		
+		public close: () ==> ()
+		close() ==
+			closed := true
+			post
+				closed = true;
+ 
+end Report

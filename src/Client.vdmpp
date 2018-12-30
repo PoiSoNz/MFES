@@ -1,12 +1,9 @@
 class Client
-
-	types
-		public String = seq1 of char;
 		
 	instance variables
 		private static id_count: nat := 1;
 		private id: nat;
-		private name: String;
+		private name: Utils`String;
 		private moneyBalance: real := 0;
 		private documents: seq of Document := [];
 
@@ -16,7 +13,7 @@ class Client
 		/*
 			Create a client providing a positive starting money balance
 		*/
-		public Client: String * real ==> Client
+		public Client: Utils`String * real ==> Client
 		Client(name_, startingMoneyBalance) ==
 		(
 			id := id_count;
@@ -29,12 +26,13 @@ class Client
 				startingMoneyBalance > 0
 			post
 				id_count = id_count~ + 1 and
-				id = id_count~;
+				id = id_count~ and
+				documents = [];
 		
 		/*
 			Create a client with no money balance (zero)
 		*/
-		public Client: String ==> Client
+		public Client: Utils`String ==> Client
 		Client(name_) ==
 		(
 			id := id_count;
@@ -46,6 +44,10 @@ class Client
 			post
 				id_count = id_count~ + 1 and
 				id = id_count~ and
-				moneyBalance = 0;
+				moneyBalance = 0 and
+				documents = [];
+				
+		--assignDocument
+		-- adiciona documento a documents, e faz setOwner nesse documento
  
 end Client

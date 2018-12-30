@@ -4,14 +4,15 @@ class Printer
 		private static id_count: nat := 1;
 		private id: nat;
 		private inkQuantities: seq1 of nat := [0, 0]; -- [black&white, color]
-		private paperQuantities: seq1 of nat := [0, 0, 0, 0]; -- [A3, A4, A5, A6]
+		private paperQuantities: seq1 of nat := [0, 0, 0]; -- [A3, A4, A5]
 		private printingQueue: seq of Document := [];
-		private openReports: seq of Report := [];
+		private openReports: seq of Report := []; 
+		-- WHEN REPORTS ARE CLOSED (FIXED), REMOVE THEM FROM OPEN REPORTS
 		private damaged: bool := false;
 		private location: char;
 
 		inv len inkQuantities = 2 and 
-				len paperQuantities = 4;
+				len paperQuantities = 3;
 
 	operations
 		public Printer: seq1 of nat * seq1 of nat * char ==> Printer

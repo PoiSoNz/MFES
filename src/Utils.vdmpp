@@ -1,0 +1,6 @@
+class Utils
+
+	types
+		public String = seq1 of char;
+		
+end Utils
