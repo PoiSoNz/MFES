@@ -11,7 +11,7 @@
 
 # UML class diagram
 ## Current version
-![UML diagram Current Version](https://imgur.com/BBm4vzF.png)
+![UML diagram Current Version](https://imgur.com/7qb32hO.png)
 
 ## V1
 ![UML diagram V1](https://imgur.com/jXrrDmK.png)
