@@ -5,12 +5,13 @@ class Printer
 		private id: nat;
 		private inkQuantities: seq1 of nat := [0, 0]; -- [black&white, color]
 		private paperQuantities: seq1 of nat := [0, 0, 0]; -- [A3, A4, A5]
-		private printingQueue: seq of Document := [];
 		private openReports: seq of Report := []; 
 		-- WHEN REPORTS ARE CLOSED (FIXED), REMOVE THEM FROM OPEN REPORTS
 		private damaged: bool := false;
 		private location: char;
-
+		-- these variables is public so that it can be accessed on other classes' post conditions
+		public printingQueue: seq of Document := [];
+		
 		inv len inkQuantities = 2 and 
 				len paperQuantities = 3;
 
@@ -32,6 +33,17 @@ class Printer
 				openReports = [] and
 				damaged = false;
 				
+		public addToQueue: Document ==> ()
+		addToQueue(document) ==
+			printingQueue := printingQueue ^ [document]
+			pre
+				document not in set elems printingQueue
+			post
+				document in set elems printingQueue and
+				len printingQueue = len printingQueue~ + 1;
+		--PERGUNTAR AO PROFESSOR SE VALE APENA ESTAR A REPETIR POS CONDIÇOES IGUAS EM VARIAS FUNÇOES
+		
+		
 		-- CODE FROM MOODLE STACK EXAMPLE
  --public clear: () ==> ()
  --clear() == contents := [];

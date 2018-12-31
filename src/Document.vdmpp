@@ -1,4 +1,7 @@
 class Document
+	/*
+		Represents a document that can be printed and possessed by clients
+	*/
 	
 	types
 		public ColorType = <BlackWhite> | <Color>;
@@ -13,8 +16,9 @@ class Document
 		private inkQuantity: nat1;
 		private paperQuantity: nat1;
 		private price: real;
-		private status: DocumentStatus := <NotPrinted>;
-		private owner: [Client] := nil;
+		-- these variables are public so that they can be accessed on other classes' post conditions
+		public status: DocumentStatus := <NotPrinted>;
+		public owner: [Client] := nil;
 
 		--inv ;
 
@@ -36,13 +40,32 @@ class Document
 				id_count = id_count~ + 1 and
 				id = id_count~ and
 				owner = nil and
-				price > 0;
+				price > 0 and
+				status = <NotPrinted>;
 				
+		public queued: () ==> ()
+		queued() ==
+			status := <Queued>
+			pre
+				status = <NotPrinted>
+			post
+				status = <Queued>;
+		
+		public printed: () ==> ()
+		printed() ==
+			status := <Printed>
+			pre
+				status = <Queued>
+			post
+				status = <Printed>;
+						
 		public setOwner: Client ==> ()
 		setOwner(client) ==
 			owner := client
+			pre
+				owner = nil
 			post
-				owner <> nil;
+				owner = client;
 				
 	functions
 		public static calculatePrice: ColorType * PaperSize * nat1 -> real
@@ -51,17 +74,21 @@ class Document
 		
 		public static colorCostFactor: ColorType -> real
 		colorCostFactor(color) ==
+		(
 			cases color:
 				<BlackWhite> -> 1,
 				<Color> -> 1.5
-			end;
+			end
+		);
 			
 		public static sheetCost: PaperSize -> real
 		sheetCost(sheetSize) ==
+		(
 			cases sheetSize:
 				<A3> -> 0.07,
 				<A4> -> 0.05,
 				<A5> -> 0.03
-			end;
+			end
+		);
  
 end Document

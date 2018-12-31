@@ -49,5 +49,38 @@ class Client
 				
 		--assignDocument
 		-- adiciona documento a documents, e faz setOwner nesse documento
- 
+ 		public assignDocument: Document ==> ()
+		assignDocument(document) ==
+		(
+			documents := documents ^ [document];
+			document.setOwner(self);
+		)
+			pre
+				document not in set elems documents
+			post
+				document.owner = self and
+				document in set elems documents and
+				len documents = len documents~ + 1;
+				
+		public moneyDeposit: real ==> ()
+		moneyDeposit(amount) ==
+			moneyBalance := moneyBalance + amount
+			pre
+				amount > 0
+			post
+				moneyBalance > moneyBalance~;
+				
+		public requestPrint: Document * Printer ==> ()
+		requestPrint(document, printer) ==
+		(
+			printer.addToQueue(document);
+			document.queued()
+		)
+			pre
+				document.status = <NotPrinted> and
+				document in set elems documents
+			post
+				document in set elems printer.printingQueue and
+				document.status = <Queued>;
+				
 end Client

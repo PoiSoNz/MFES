@@ -15,6 +15,9 @@ class Report
 		--inv ;
 
 	operations
+		/*
+			Create a report with no technician associated to fix it
+		*/
 		public Report: MalfunctionType * Printer ==> Report
 		Report(malfunction_, printer_) ==
 		(
@@ -29,16 +32,38 @@ class Report
 				id = id_count~ and
 				technician = nil and
 				closed = false;
+		/*
+			Create a report with a technician assigned to fix it
+		*/
+		public Report: MalfunctionType * Printer * Technician ==> Report
+		Report(malfunction_, printer_, technician_) ==
+		(
+			id := id_count;
+			id_count := id_count + 1;
+			malfunction := malfunction_;
+			printer := printer_;
+			technician := technician_;
+			return self
+		)
+			post
+				id_count = id_count~ + 1 and
+				id = id_count~ and
+				technician <> nil and
+				closed = false;
 				
 		public setTechnician: Technician ==> ()
 		setTechnician(technician_) ==
 			technician := technician_
+			pre
+				technician = nil
 			post
-				technician <> nil;
+				technician = technician_;
 		
 		public close: () ==> ()
 		close() ==
 			closed := true
+			pre
+				closed = false
 			post
 				closed = true;
  
