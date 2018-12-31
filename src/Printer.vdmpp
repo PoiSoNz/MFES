@@ -1,19 +1,18 @@
 class Printer
-
+	
 	instance variables
-		private static id_count: nat := 1;
-		private id: nat;
-		private inkQuantities: seq1 of nat := [0, 0]; -- [black&white, color]
-		private paperQuantities: seq1 of nat := [0, 0, 0]; -- [A3, A4, A5]
-		private openReports: seq of Report := []; 
+		public static id_count: nat := 1;
+		public id: nat;
+		public inkQuantities: seq1 of nat := [0, 0]; -- [black&white, color]
+		public paperQuantities: seq1 of nat := [0, 0, 0]; -- [A3, A4, A5]
+		public openReports: seq of Report := []; 
 		-- WHEN REPORTS ARE CLOSED (FIXED), REMOVE THEM FROM OPEN REPORTS
-		private damaged: bool := false;
-		private location: char;
-		-- these variables is public so that it can be accessed on other classes' post conditions
+		public damaged: bool := false;
+		public location: char;
 		public printingQueue: seq of Document := [];
 		
-		inv len inkQuantities = 2 and 
-				len paperQuantities = 3;
+		inv len inkQuantities = Utils`INK_TYPES_NUM and 
+				len paperQuantities = Utils`PAPER_TYPES_NUM;
 
 	operations
 		public Printer: seq1 of nat * seq1 of nat * char ==> Printer
@@ -25,7 +24,10 @@ class Printer
 			paperQuantities := paperQuantities_;
 			location := location_;
 			return self
-		)	
+		)
+			pre
+				len inkQuantities_ = Utils`INK_TYPES_NUM and 
+				len paperQuantities_ = Utils`PAPER_TYPES_NUM
 			post
 				id_count = id_count~ + 1 and
 				id = id_count~ and
@@ -41,7 +43,38 @@ class Printer
 			post
 				document in set elems printingQueue and
 				len printingQueue = len printingQueue~ + 1;
+				
+		public solveDamage: () ==> ()
+		solveDamage() ==
+			damaged := false
+			pre
+				damaged
+			post
+				not damaged;
+				
+		public refillInkCartridge: nat1 * nat1 ==> ()
+		refillInkCartridge(inkQuantity, inkCartridgeIndex) ==
+			inkQuantities(inkCartridgeIndex) := inkQuantities(inkCartridgeIndex) + inkQuantity
+			pre
+				inkCartridgeIndex >= Utils`BLACK_INK_CARTDG_IDX and
+				inkCartridgeIndex <= Utils`COLOR_INK_CARTDG_IDX and
+				inkQuantity > 0
+			post
+				inkQuantities(inkCartridgeIndex) - inkQuantities~(inkCartridgeIndex) = inkQuantity;
+				
+		public refillPaperType: nat1 * nat1 ==> ()
+		refillPaperType(paperQuantity, paperTypeIndex) ==
+			paperQuantities(paperTypeIndex) := paperQuantities(paperTypeIndex) + paperQuantity
+			pre
+				paperTypeIndex >= Utils`A3_PAPER_IDX and
+				paperTypeIndex <= Utils`A5_PAPER_IDX and
+				paperQuantity > 0
+			post
+				paperQuantities(paperTypeIndex) - paperQuantities~(paperTypeIndex) = paperQuantity;
+				
 		--PERGUNTAR AO PROFESSOR SE VALE APENA ESTAR A REPETIR POS CONDIÇOES IGUAS EM VARIAS FUNÇOES
+		
+		--SEMPRE QUE A IMPRESSORA IMPRIMIR UM DOCUMENTO, LANÇAR UM RANDOM QUE DIZ SE FICOU DAMAGED OU NAO
 		
 		
 		-- CODE FROM MOODLE STACK EXAMPLE

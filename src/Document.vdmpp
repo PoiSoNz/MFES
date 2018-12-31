@@ -9,14 +9,13 @@ class Document
 		public DocumentStatus = <NotPrinted> | <Queued> | <Printed>; -- A document is considered <NotPrinted> if it hasn't been queued yet
 		
 	instance variables
-		private static id_count: nat := 1;
-		private id: nat;
-		private color: ColorType;
-		private size: PaperSize;
-		private inkQuantity: nat1;
-		private paperQuantity: nat1;
-		private price: real;
-		-- these variables are public so that they can be accessed on other classes' post conditions
+		public static id_count: nat := 1;
+		public id: nat;
+		public color: ColorType;
+		public size: PaperSize;
+		public inkQuantity: nat1;
+		public paperQuantity: nat1;
+		public price: real;
 		public status: DocumentStatus := <NotPrinted>;
 		public owner: [Client] := nil;
 

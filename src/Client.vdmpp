@@ -1,11 +1,11 @@
 class Client
 		
 	instance variables
-		private static id_count: nat := 1;
-		private id: nat;
-		private name: Utils`String;
-		private moneyBalance: real := 0;
-		private documents: seq of Document := [];
+		public static id_count: nat := 1;
+		public id: nat;
+		public name: Utils`String;
+		public moneyBalance: real := 0;
+		public documents: seq of Document := [];
 
 		--inv ;
 
@@ -68,7 +68,7 @@ class Client
 			pre
 				amount > 0
 			post
-				moneyBalance > moneyBalance~;
+				moneyBalance - moneyBalance~ = amount;
 				
 		public requestPrint: Document * Printer ==> ()
 		requestPrint(document, printer) ==

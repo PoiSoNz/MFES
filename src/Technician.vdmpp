@@ -1,11 +1,13 @@
 class Technician
-		
+	
+	values
+		private INK_REFILL_QUANTITY = 25;
+	
 	instance variables
 		private static id_count: nat := 1;
 		private id: nat;
 		private name: Utils`String;
 		private fixedReports: seq of Report := [];
-		private ongoingReports: seq of Report := [];
 
 		--inv ;
 
@@ -21,7 +23,48 @@ class Technician
 			post
 				id_count = id_count~ + 1 and
 				id = id_count~ and
-				fixedReports = [] and
-				ongoingReports = [];
- 
+				fixedReports = [];
+
+		public fixPrinterProblem: Report ==> ()
+		fixPrinterProblem(report) ==
+		(
+			cases report.malfunction:
+				<Damaged> -> self.fixDamage(report.printer),
+				<BlackInkEmpty> -> self.fixLackOfInk(report.printer, Utils`BLACK_INK_CARTDG_IDX),
+				<ColorInkEmpty> -> self.fixLackOfInk(report.printer, Utils`COLOR_INK_CARTDG_IDX),
+				<A3Empty> -> self.fixLackOfPaper(report.printer, Utils`A3_PAPER_IDX),
+				<A4Empty> -> self.fixLackOfPaper(report.printer, Utils`A4_PAPER_IDX),
+				<A5Empty> -> self.fixLackOfPaper(report.printer, Utils`A5_PAPER_IDX)
+			end;
+			report.close(self)
+		)
+			pre
+				not report.closed
+			post
+				report.closed;
+
+		public fixDamage: Printer ==> ()
+		fixDamage(printer) ==
+			printer.solveDamage()
+			pre
+				printer.damaged
+			post
+				not printer.damaged;
+				
+		public fixLackOfInk: Printer * nat1 ==> ()
+		fixLackOfInk(printer, inkCartridgeIndex) ==
+			printer.refillInkCartridge(Utils`INK_REFILL_QUANTITY, inkCartridgeIndex)
+			pre
+				TODO
+			post
+				TODO;
+				
+		public fixLackOfPaper: Printer * nat1 ==> ()
+		fixLackOfPaper(printer, paperTypeIndex) ==
+			printer.refillPaperType(Utils`PAPER_REFILL_QUANTITY, paperTypeIndex)
+			pre
+				TODO
+			post
+				TODO;
+
 end Technician
