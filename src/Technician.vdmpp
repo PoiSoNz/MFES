@@ -36,12 +36,16 @@ class Technician
 				<A4Empty> -> self.fixLackOfPaper(report.printer, Utils`A4_PAPER_IDX),
 				<A5Empty> -> self.fixLackOfPaper(report.printer, Utils`A5_PAPER_IDX)
 			end;
-			report.close(self)
+			report.close(self);
+			fixedReports := fixedReports ^ [report]
 		)
 			pre
-				not report.closed
+				not report.closed and
+				report not in set elems fixedReports
 			post
-				report.closed;
+				report.closed and
+				report not in set elems fixedReports and
+				len fixedReports = len fixedReports~ + 1;
 
 		public fixDamage: Printer ==> ()
 		fixDamage(printer) ==
@@ -54,17 +58,13 @@ class Technician
 		public fixLackOfInk: Printer * nat1 ==> ()
 		fixLackOfInk(printer, inkCartridgeIndex) ==
 			printer.refillInkCartridge(Utils`INK_REFILL_QUANTITY, inkCartridgeIndex)
-			pre
-				TODO
 			post
-				TODO;
+				printer.inkQuantities(inkCartridgeIndex) >= Utils`INK_REFILL_QUANTITY;
 				
 		public fixLackOfPaper: Printer * nat1 ==> ()
 		fixLackOfPaper(printer, paperTypeIndex) ==
 			printer.refillPaperType(Utils`PAPER_REFILL_QUANTITY, paperTypeIndex)
-			pre
-				TODO
 			post
-				TODO;
+				printer.paperQuantities(paperTypeIndex) >= Utils`PAPER_REFILL_QUANTITY;
 
 end Technician
