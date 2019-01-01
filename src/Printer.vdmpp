@@ -44,8 +44,8 @@ class Printer
 				document in set elems printingQueue and
 				len printingQueue = len printingQueue~ + 1;
 				
-		public solveDamage: () ==> ()
-		solveDamage() ==
+		public repairDamage: () ==> ()
+		repairDamage() ==
 			damaged := false
 			pre
 				damaged
