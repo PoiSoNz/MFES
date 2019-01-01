@@ -44,10 +44,10 @@ class Technician
 				report not in set elems fixedReports
 			post
 				report.closed and
-				report not in set elems fixedReports and
+				report in set elems fixedReports and
 				len fixedReports = len fixedReports~ + 1;
 
-		public fixDamage: Printer ==> ()
+		private fixDamage: Printer ==> ()
 		fixDamage(printer) ==
 			printer.repairDamage()
 			pre
@@ -55,13 +55,13 @@ class Technician
 			post
 				not printer.damaged;
 				
-		public fixLackOfInk: Printer * nat1 ==> ()
+		private fixLackOfInk: Printer * nat1 ==> ()
 		fixLackOfInk(printer, inkCartridgeIndex) ==
 			printer.refillInkCartridge(Utils`INK_REFILL_QUANTITY, inkCartridgeIndex)
 			post
 				printer.inkQuantities(inkCartridgeIndex) >= Utils`INK_REFILL_QUANTITY;
 				
-		public fixLackOfPaper: Printer * nat1 ==> ()
+		private fixLackOfPaper: Printer * nat1 ==> ()
 		fixLackOfPaper(printer, paperTypeIndex) ==
 			printer.refillPaperType(Utils`PAPER_REFILL_QUANTITY, paperTypeIndex)
 			post
