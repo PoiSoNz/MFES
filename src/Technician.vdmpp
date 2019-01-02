@@ -38,7 +38,6 @@ class Technician
 			end;
 			report.close(self);
 			fixedReports := fixedReports ^ [report]
-			TODO tirar report dos open reports da impressora
 		)
 			pre
 				not report.closed and

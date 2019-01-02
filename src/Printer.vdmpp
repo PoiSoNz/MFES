@@ -105,16 +105,52 @@ class Printer
 		private consumePrintingResources: Document ==> bool
 		consumePrintingResources(document) ==
 		(
-			TODO
+			dcl inkCartridgeIndex: nat1 := getInkCartridgeIndex(document.color);
+			dcl paperSizeIndex: nat1 := getPaperSizeIndex(document.size);
+			
+			if
+				inkQuantities(inkCartridgeIndex) >= document.inkQuantity and
+				paperQuantities(paperSizeIndex) >= document.paperQuantity
+			then -- There's enough resources to print
+			(
+				inkQuantities(inkCartridgeIndex) := inkQuantities(inkCartridgeIndex) - document.inkQuantity;
+				paperQuantities(paperSizeIndex) := paperQuantities(paperSizeIndex) - document.paperQuantity;
+				return true
+			)
+			else
+			(
+				dcl inkCartridgeReportType: Report`MalfunctionType := getInkCartridgeReportType(document.color);
+				dcl paperSizeReportType: Report`MalfunctionType := getPaperSizeReportType(document.size);
+				
+				if
+					inkQuantities(inkCartridgeIndex) < document.inkQuantity
+				then -- There's not enough ink resource to print
+					createReport(inkCartridgeReportType);
+				
+				if
+					paperQuantities(paperSizeIndex) < document.paperQuantity
+				then -- There's not enough paper resource to print
+					createReport(paperSizeReportType);
+				
+				return false
+			)
 		)
 			pre
-				--
+				document = hd printingQueue
 			post
-				--;
+				if RESULT = true
+				then
+					(exists1 inkCartridgeIdx in set inds inkQuantities & inkQuantities~(inkCartridgeIdx) - inkQuantities(inkCartridgeIdx) = document.inkQuantity) and
+					(exists1 paperSizeIdx in set inds paperQuantities & paperQuantities~(paperSizeIdx) - paperQuantities(paperSizeIdx) = document.paperQuantity)
+				else -- If no resources were consumed, they must not be altered
+					(forall inkCartridgeIdx in set inds inkQuantities & inkQuantities(inkCartridgeIdx) = inkQuantities~(inkCartridgeIdx)) and
+					(forall paperSizeIdx in set inds paperQuantities & paperQuantities(paperSizeIdx) = paperQuantities~(paperSizeIdx));
+					
 		
 		/*
-			Tries to print the next document in the printing queue. Returns true if it was printed and false otherwise
+			Tries to print the next document in the printing queue, respecting FIFO order. Returns true if it was printed and false otherwise
 			If it was not printed due to lack of resources, at least one report should exist trying to increase the resources available for printing the document
+			After the document is printed, there's a probability of damaging the printer. If it happens, a report is created for that issue
 		*/		
 		public printNext: () ==> bool
 		printNext() ==
@@ -156,20 +192,81 @@ class Printer
 				(RESULT = false and
 					len printingQueue = len printingQueue~ and
 					forall idx in set inds printingQueue & printingQueue(idx) = printingQueue~(idx)); -- Ensures the queue order was not changed
-					
+		
+		/*
+			Tries to print all the documents existing in the printing queue, respecting FIFO order. Returns true if all were printed, false otherwise
+			If somewhere in the queue a document was not printed due to lack of resources, at least one report should exist trying to increase the resources available for printing the document
+			After each document is printed, there's a probability of damaging the printer. If it happens, a report is created for that issue nd no more printings can be performed
+		*/
+		public printAll: () ==> ()
+		printAll() ==
+		(
+			TODO
+		)
+			pre
+				--
+			post
+				--
+			;
+			
+		/*
+			Create a report for a given malfunction
+			The report is not created if already exists one reporting the same issue. This ensures there's not multiple reports created for the same problem
+		*/			
 		private createReport: Report`MalfunctionType ==> ()
 		createReport(malfunction) ==
 		(
-			dcl newReport: Report := new Report(malfunction, self);
-			openReports := openReports ^ [newReport]
+			if
+				not existsReport(malfunction)
+			then
+			(
+				dcl newReport: Report := new Report(malfunction, self);
+				openReports := openReports ^ [newReport]
+			)
 		)
 			post
-				len openReports = len openReports~ + 1 and
-				openReports(len openReports).malfunction = malfunction;
+				(forall idx1 in set inds openReports & not exists idx2 in set inds openReports & openReports(idx1) = openReports(idx2) and idx1 <> idx2) -- guarantee there's not multiple reports about the same malfunction
+				and
+				(
+					(len openReports = len openReports~ + 1 and openReports(len openReports).malfunction = malfunction)
+					or
+					(len openReports = len openReports~ and exists report in set elems openReports & report.malfunction = malfunction)
+				);
 				
+		/*
+			Verifies if there's an openReport regarding a given malfunction. Returns true if it exists, and false otherwise
+		*/
+		private existsReport: Report`MalfunctionType ==> bool
+		existsReport(reportType) ==
+			return exists report in set elems openReports & report.malfunction = reportType
+			post
+				if RESULT = false 
+				then forall report in set elems openReports & report.malfunction <> reportType
+				else exists report in set elems openReports & report.malfunction = reportType;
+				
+		/*
+			Remove the report regarding a given malfunction
+			This function is called by the Report, after its malfunction gets fixed and is closed
+		*/
+		public removeReport: Report`MalfunctionType ==> ()
+		removeReport(malfunction) ==
+		(
+			for all i in set inds openReports do 
+			(
+				if
+					openReports(i).malfunction = malfunction
+				then
+				(
+					openReports := openReports(1,...,i-1) ^ openReports(i+1,...,len openReports);
+					return
+				)
+			)
+		)
+			pre
+				exists report in set elems openReports & report.malfunction = malfunction
+			post
+				forall report in set elems openReports & report.malfunction <> malfunction;
 		--PERGUNTAR AO PROFESSOR SE VALE APENA ESTAR A REPETIR POS CONDIÇOES IGUAS EM VARIAS FUNÇOES
-		
-		--SEMPRE QUE A IMPRESSORA IMPRIMIR UM DOCUMENTO, LANÇAR UM RANDOM QUE DIZ SE FICOU DAMAGED OU NAO
 		
 	functions
 		private getInkCartridgeIndex: Document`ColorType -> nat1

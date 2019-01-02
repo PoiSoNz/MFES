@@ -39,6 +39,7 @@ class Report
 		public close: Technician ==> ()
 		close(technician) ==
 		(
+			printer.removeReport(malfunction);
 			closed := true;
 			solverTechnician := technician
 		)
