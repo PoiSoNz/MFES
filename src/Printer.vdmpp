@@ -62,21 +62,153 @@ class Printer
 			post
 				inkQuantities(inkCartridgeIndex) - inkQuantities~(inkCartridgeIndex) = inkQuantity;
 				
-		public refillPaperType: nat1 * nat1 ==> ()
-		refillPaperType(paperQuantity, paperTypeIndex) ==
-			paperQuantities(paperTypeIndex) := paperQuantities(paperTypeIndex) + paperQuantity
+		public refillPaperSize: nat1 * nat1 ==> ()
+		refillPaperSize(paperQuantity, paperSizeIndex) ==
+			paperQuantities(paperSizeIndex) := paperQuantities(paperSizeIndex) + paperQuantity
 			pre
-				paperTypeIndex >= Utils`A3_PAPER_IDX and
-				paperTypeIndex <= Utils`A5_PAPER_IDX and
+				paperSizeIndex >= Utils`A3_PAPER_IDX and
+				paperSizeIndex <= Utils`A5_PAPER_IDX and
 				paperQuantity > 0
 			post
-				paperQuantities(paperTypeIndex) - paperQuantities~(paperTypeIndex) = paperQuantity;
+				paperQuantities(paperSizeIndex) - paperQuantities~(paperSizeIndex) = paperQuantity;
+		
+		/*
+			Generated a random number to decide if the printer gets damaged (if it gets damaged, a report is created)
+			The generated number is returned, so that we can have access to it in the post condition
+		*/
+		private generateRandomDamage: () ==> nat1
+		generateRandomDamage() ==
+		(
+			dcl randNum: nat1 := MATH`rand(99) + 1;
+			
+			if 
+				randNum <= Utils`DAMAGE_PROBABILITY
+			then 
+			(
+				damaged := true;
+				self.createReport(<Damaged>)
+			);
+			return randNum
+		)
+			pre
+				not damaged
+			post
+				(RESULT <= Utils`DAMAGE_PROBABILITY and damaged and openReports(len openReports).malfunction = <Damaged>)
+				or
+				(RESULT > Utils`DAMAGE_PROBABILITY and not damaged);
+				
+		/*
+			Tries to consume the ink and paper resources to print a document, returns true if resources were consumed, and false if they weren't
+			If there are not enough resources a report for the missing resources is created and returns false
+			A report for a given lack of resources is created, if there isn't already a report for the same problem. Otherwise, we would be creating many reports for the same problem
+		*/
+		private consumePrintingResources: Document ==> bool
+		consumePrintingResources(document) ==
+		(
+			TODO
+		)
+			pre
+				--
+			post
+				--;
+		
+		/*
+			Tries to print the next document in the printing queue. Returns true if it was printed and false otherwise
+			If it was not printed due to lack of resources, at least one report should exist trying to increase the resources available for printing the document
+		*/		
+		public printNext: () ==> bool
+		printNext() ==
+		(
+			dcl canBePrinted: bool;
+			
+			if
+				damaged
+			then
+			(
+				IO`print("Cannot print, printer is damaged");
+				return false
+			)
+			elseif
+				len printingQueue = 0
+			then
+			(
+				IO`print("There are no documents to print");
+				return false
+			)	;
+			
+			canBePrinted := self.consumePrintingResources(hd printingQueue);
+			if
+				canBePrinted
+			then
+			(
+				dcl generatedNumber: nat1 := self.generateRandomDamage();
+				printingQueue := tl printingQueue;
+			);
+			
+			return canBePrinted
+		)
+			post
+				(RESULT = true and 
+					hd printingQueue~ not in set elems printingQueue and
+					len printingQueue = len printingQueue~ - 1 and
+					forall idx in set inds printingQueue & printingQueue(idx) = (tl printingQueue~)(idx)) -- Ensures the other elements of the queue are still in the same order
+				or
+				(RESULT = false and
+					len printingQueue = len printingQueue~ and
+					forall idx in set inds printingQueue & printingQueue(idx) = printingQueue~(idx)); -- Ensures the queue order was not changed
+					
+		private createReport: Report`MalfunctionType ==> ()
+		createReport(malfunction) ==
+		(
+			dcl newReport: Report := new Report(malfunction, self);
+			openReports := openReports ^ [newReport]
+		)
+			post
+				len openReports = len openReports~ + 1 and
+				openReports(len openReports).malfunction = malfunction;
 				
 		--PERGUNTAR AO PROFESSOR SE VALE APENA ESTAR A REPETIR POS CONDIÇOES IGUAS EM VARIAS FUNÇOES
 		
 		--SEMPRE QUE A IMPRESSORA IMPRIMIR UM DOCUMENTO, LANÇAR UM RANDOM QUE DIZ SE FICOU DAMAGED OU NAO
 		
+	functions
+		private getInkCartridgeIndex: Document`ColorType -> nat1
+		getInkCartridgeIndex(color) ==
+		(
+			cases color:
+				<BlackWhite> -> Utils`BLACK_INK_CARTDG_IDX,
+				<Color> -> Utils`COLOR_INK_CARTDG_IDX
+			end
+		);
 		
+		private getPaperSizeIndex: Document`PaperSize -> nat1
+		getPaperSizeIndex(paperSize) ==
+		(
+			cases paperSize:
+				<A3> -> Utils`A3_PAPER_IDX,
+				<A4> -> Utils`A4_PAPER_IDX,
+				<A5> -> Utils`A5_PAPER_IDX
+			end
+		);
+		
+		private getInkCartridgeReportType: Document`ColorType -> Report`MalfunctionType
+		getInkCartridgeReportType(color) ==
+		(
+			cases color:
+				<BlackWhite> -> <BlackInkEmpty>,
+				<Color> -> <ColorInkEmpty>
+			end
+		);
+		
+		private getPaperSizeReportType: Document`PaperSize -> Report`MalfunctionType
+		getPaperSizeReportType(paperSize) ==
+		(
+			cases paperSize:
+				<A3> -> <A3Empty>,
+				<A4> -> <A4Empty>,
+				<A5> -> <A5Empty>
+			end
+		);
 		-- CODE FROM MOODLE STACK EXAMPLE
  --public clear: () ==> ()
  --clear() == contents := [];

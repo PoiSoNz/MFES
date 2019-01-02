@@ -7,7 +7,7 @@ class Client
 		public moneyBalance: real := 0;
 		public documents: seq of Document := [];
 
-		--inv ;
+		inv moneyBalance >= 0;
 
 	operations
 		/*
@@ -27,6 +27,7 @@ class Client
 			post
 				id_count = id_count~ + 1 and
 				id = id_count~ and
+				moneyBalance = startingMoneyBalance and
 				documents = [];
 		
 		/*
@@ -74,15 +75,17 @@ class Client
 		requestPrint(document, printer) ==
 		(
 			printer.addToQueue(document);
-			document.queued()
+			document.queued();
+			moneyBalance := moneyBalance - document.price
 		)
 			pre
 				document.status = <NotPrinted> and
-				document in set elems documents
+				document in set elems documents and
+				moneyBalance >= document.price
 			post
 				document in set elems printer.printingQueue and
-				document.status = <Queued>;
-		--
-		TODO: TIRAR DO MONEY BALANCE O PREÇO DO DOCUMENTO (PRE CONDITION A VERIFICAR SE TEM DINHEIRO SUFICIENTE PARA O PRINT
+				document.status = <Queued> and
+				moneyBalance~ - moneyBalance = document.price and
+				moneyBalance >= 0;
 		
 end Client

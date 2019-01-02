@@ -12,6 +12,8 @@ class Utils
 		public A4_PAPER_IDX = 2;
 		public A5_PAPER_IDX = 3;
 		public PAPER_TYPES_NUM = 3;
+		-- Printer damage
+		public DAMAGE_PROBABILITY = 80;
 		
 	types
 		public String = seq1 of char;

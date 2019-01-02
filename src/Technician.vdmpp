@@ -38,6 +38,7 @@ class Technician
 			end;
 			report.close(self);
 			fixedReports := fixedReports ^ [report]
+			TODO tirar report dos open reports da impressora
 		)
 			pre
 				not report.closed and
@@ -63,7 +64,7 @@ class Technician
 				
 		private fixLackOfPaper: Printer * nat1 ==> ()
 		fixLackOfPaper(printer, paperTypeIndex) ==
-			printer.refillPaperType(Utils`PAPER_REFILL_QUANTITY, paperTypeIndex)
+			printer.refillPaperSize(Utils`PAPER_REFILL_QUANTITY, paperTypeIndex)
 			post
 				printer.paperQuantities(paperTypeIndex) >= Utils`PAPER_REFILL_QUANTITY;
 
