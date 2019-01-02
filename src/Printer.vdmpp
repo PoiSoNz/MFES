@@ -178,13 +178,18 @@ class Printer
 			then
 			(
 				dcl generatedNumber: nat1 := self.generateRandomDamage();
-				printingQueue := tl printingQueue;
+				
+				dcl printingDocument: Document := hd printingQueue;
+				printingDocument.printed();
+
+				printingQueue := tl printingQueue
 			);
 			
 			return canBePrinted
 		)
 			post
 				(RESULT = true and 
+					(hd printingQueue~).status = <Printed> and
 					hd printingQueue~ not in set elems printingQueue and
 					len printingQueue = len printingQueue~ - 1 and
 					forall idx in set inds printingQueue & printingQueue(idx) = (tl printingQueue~)(idx)) -- Ensures the other elements of the queue are still in the same order
