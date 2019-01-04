@@ -207,13 +207,39 @@ class Printer
 		public printAll: () ==> ()
 		printAll() ==
 		(
-			TODO
+			dcl continue: bool := true;
+			
+
+			while continue do
+			(
+				continue := self.printNext();
+				
+				if
+					continue = false and
+					len printingQueue = 0
+				then
+				(
+					IO`print("Printer finished!");
+				)
+				else
+				(
+					IO`print("An error occurred. Check the report for details!");
+				)
+			)
 		)
 			pre
-				--
+				(
+					not damaged and
+					len printingQueue > 0
+				)
 			post
-				--
-			;
+				(RESULT = true and 
+					len printingQueue = 0 and
+					forall doc in set printingQueue & doc.status = <Printed>)
+				or
+				(RESULT = false and
+					len printingQueue = len printingQueue~ and
+					forall idx in set inds printingQueue & printingQueue(idx) = printingQueue~(idx)); -- Ensures the queue order was not changed
 			
 		/*
 			Create a report for a given malfunction
