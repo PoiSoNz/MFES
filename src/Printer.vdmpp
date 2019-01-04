@@ -3,7 +3,6 @@ class Printer
 	instance variables
 		public static id_count: nat := 1;
 		public id: nat;
-		-- TALVEZ MUDAR SE HOUVER TEMPO PARA MAP de ColorType e PaperType |-> nat EM VEZ DE UMA SEQUENCIA
 		public inkQuantities: seq1 of nat := [0, 0]; -- [black&white, color]
 		public paperQuantities: seq1 of nat := [0, 0, 0]; -- [A3, A4, A5]
 		public openReports: seq of Report := []; 

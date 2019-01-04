@@ -87,7 +87,7 @@ class Client
 				moneyBalance >= document.price
 			post
 				document.status = <Queued> and
-				moneyBalance~ - moneyBalance = document.price and
+				moneyBalance = moneyBalance~ - document.price and
 				moneyBalance >= 0;
 				
 		public requestPrint: Document ==> ()
@@ -103,7 +103,7 @@ class Client
 				moneyBalance >= document.price
 			post
 				document.status = <Queued> and
-				moneyBalance~ - moneyBalance = document.price and
+				moneyBalance = moneyBalance~ - document.price and
 				moneyBalance >= 0;
 		
 end Client

@@ -80,6 +80,34 @@ class PrintingServiceTest
 			assertTrue({doc1, doc2, doc3} subset elems client.documents);
 		);
 		
+		private testClientRequestPrints: () ==> ()
+		testClientRequestPrints() ==
+		(
+			dcl client: Client := new Client("Joao", 10);
+			dcl doc1: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			dcl doc2: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			dcl printer1: Printer := new Printer([50, 50], [50, 50, 50], 'a');
+			dcl printer2: Printer := new Printer([50, 50], [50, 50, 50], 'b');
+			
+			dcl ps: PrintingService := new PrintingService({printer1, printer2});
+			
+			client.assignDocument(doc1);
+			client.assignDocument(doc2);
+
+			assertEqual(doc1.status, <NotPrinted>);
+			client.requestPrint(doc1);
+			assertEqual(doc1.status, <Queued>);
+			
+			assertEqual(doc2.status, <NotPrinted>);
+			client.requestPrint(doc2, 'b');
+			assertEqual(doc2.status, <Queued>);
+			
+			assertEqual(client.moneyBalance, 10 - doc1.price - doc2.price);
+			
+			assertTrue({doc1} subset elems printer1.printingQueue);
+			assertTrue({doc2} subset elems printer2.printingQueue);
+		);
+		
 		public static main: () ==> ()
  		main() ==
  		(
@@ -91,6 +119,7 @@ class PrintingServiceTest
  			
  			new PrintingServiceTest().testClientMoneyDeposit();
  			new PrintingServiceTest().testClientAssignDocuments();
+ 			new PrintingServiceTest().testClientRequestPrints();
 		);
 		
 		

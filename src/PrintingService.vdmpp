@@ -12,6 +12,7 @@ class PrintingService
 		public PrintingService: set of Printer ==> PrintingService
 		PrintingService(printers) ==
 		(
+			servicePrinters := {|->};
 			for all printer in set printers do 
 			(
 				servicePrinters := servicePrinters munion {printer |-> printer.location}
