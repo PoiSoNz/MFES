@@ -3,7 +3,7 @@ class Printer
 	instance variables
 		public static id_count: nat := 1;
 		public id: nat;
-		TALVEZ MUDAR SE HOUVER TEMPO PARA MAP de ColorType e PaperType |-> nat EM VEZ DE UMA SEQUENCIA
+		-- TALVEZ MUDAR SE HOUVER TEMPO PARA MAP de ColorType e PaperType |-> nat EM VEZ DE UMA SEQUENCIA
 		public inkQuantities: seq1 of nat := [0, 0]; -- [black&white, color]
 		public paperQuantities: seq1 of nat := [0, 0, 0]; -- [A3, A4, A5]
 		public openReports: seq of Report := []; 
@@ -178,7 +178,7 @@ class Printer
 				canBePrinted
 			then
 			(
-				dcl generatedNumber: nat1 := self.generateRandomDamage();
+				-- dcl generatedNumber: nat1 := self.generateRandomDamage();
 				
 				dcl printingDocument: Document := hd printingQueue;
 				printingDocument.printed();
@@ -233,13 +233,12 @@ class Printer
 					len printingQueue > 0
 				)
 			post
-				(RESULT = true and 
-					len printingQueue = 0 and
-					forall doc in set printingQueue & doc.status = <Printed>)
+				( len printingQueue = 0 and
+					forall doc in seq printingQueue & doc.status = <Printed>)
 				or
-				(RESULT = false and
-					len printingQueue = len printingQueue~ and
+				(	len printingQueue = len printingQueue~ and
 					forall idx in set inds printingQueue & printingQueue(idx) = printingQueue~(idx)); -- Ensures the queue order was not changed
+			
 			
 		/*
 			Create a report for a given malfunction

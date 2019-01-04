@@ -54,6 +54,17 @@ class PrintingServiceTest
  			assertEqual(c2.moneyBalance, 32.98);
 		);
 		
+		private testClientAssignDocuments: () ==> ()
+		testClientAssignDocuments() ==
+		(
+			dcl client: Client := new Client("Joao");
+			dcl doc: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			
+			client.assignDocument(doc);
+			assertEqual(doc.owner, client);
+			assertTrue(doc in set elems client.documents);
+		);
+		
 		public static main: () ==> ()
  		main() ==
  		(

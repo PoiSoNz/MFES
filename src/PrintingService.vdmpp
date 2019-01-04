@@ -34,7 +34,7 @@ class PrintingService
 			for all currPrinter in set printersFromLocation do
 			(
 				if
-					forall printer in set printers & len currPrinter.printingQueue <= len printer.printingQueue -- get a printer with the smallest printing queue
+					forall printer in set elems servicePrinters & len currPrinter.printingQueue <= len printer.printingQueue -- get a printer with the smallest printing queue
 				then
 				(
 					currPrinter.addToQueue(document);
@@ -48,7 +48,7 @@ class PrintingService
 				(exists1 printer in set dom servicePrinters & document in set elems printer.printingQueue) and 
 				(exists1 printer in set dom servicePrinters & document in set elems printer.printingQueue and printer.location = location);
 				
-		TODO: ADICIONAR À QUEUE DE UMA IMPRESSORA QUALQUER (NÂO RECEBER LOCATION NOS ARGUMENTOS)
+		-- TODO: ADICIONAR ï¿½ QUEUE DE UMA IMPRESSORA QUALQUER (Nï¿½O RECEBER LOCATION NOS ARGUMENTOS)
 				
 		private getPrintersFromLocation: char ==> set of Printer
 		getPrintersFromLocation(location) ==
