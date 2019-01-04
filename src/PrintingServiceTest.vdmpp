@@ -1,5 +1,8 @@
 class PrintingServiceTest
-
+	/*
+		Class responsible for testing the printing service system
+	*/
+	
 	instance variables
 		-- Printers
 		p1: Printer := new Printer([50, 50], [50, 50, 50], 'a');

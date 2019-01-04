@@ -173,6 +173,8 @@ class Printer
 			Tries to print the next document in the printing queue, respecting FIFO order. Returns true if it was printed and false otherwise
 			If it was not printed due to lack of resources, at least one report should exist trying to increase the resources available for printing the document
 			After the document is printed, there's a probability of damaging the printer. If it happens, a report is created for that issue
+			If the printing queue gets empty after the printing occurs, it realocates documents from other printers' queue to this one.
+			This allows to better distribute the different printers queue size, leading to less waiting time for documents to be printed
 		*/		
 		public printNext: () ==> bool
 		printNext() ==
@@ -206,7 +208,7 @@ class Printer
 
 				printingQueue := tl printingQueue;
 				
-				-- If the printer queue is empty, get documents for other queues. This allow to remove waiting time for other documents
+				-- If the printer queue is empty, get documents from other printers' queue. This allow to remove waiting time for other documents
 				if
 					len printingQueue = 0
 				then
@@ -263,15 +265,10 @@ class Printer
 			pre
 				len printingQueue > 0
 			post
-				(RESULT = true and
-					len printingQueue = 0)
+				(RESULT = true and len printingQueue = 0)
 				or
-				(RESULT = false and
-				len printingQueue > 0 and 
-				len printingQueue <= len printingQueue~ and
-				forall idx in set inds reverse printingQueue & (reverse printingQueue)(idx) = (reverse printingQueue~)(idx)); -- Ensures the queue order was not changed
-			
-			
+				(RESULT = false and len printingQueue > 0); -- Ensures the queue order was not changed
+	
 		/*
 			Create a report for a given malfunction
 			The report is not created if already exists one reporting the same issue. This ensures there's not multiple reports created for the same problem

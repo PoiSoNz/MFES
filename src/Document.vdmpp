@@ -19,7 +19,9 @@ class Document
 		public status: DocumentStatus := <NotPrinted>;
 		public owner: [Client] := nil;
 
-		--inv ;
+		inv if status <> <NotPrinted>
+				then owner <> nil
+				else true;
 
 	operations
 		public Document: ColorType * PaperSize * nat1 * nat1 ==> Document

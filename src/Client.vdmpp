@@ -1,5 +1,8 @@
 class Client
-		
+	/*
+		Represents a client that can own documents and print them by using its money balance
+	*/
+	
 	instance variables
 		public static id_count: nat := 1;
 		public id: nat;
