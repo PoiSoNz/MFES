@@ -3,6 +3,7 @@ class Printer
 	instance variables
 		public static id_count: nat := 1;
 		public id: nat;
+		TALVEZ MUDAR SE HOUVER TEMPO PARA MAP de ColorType e PaperType |-> nat EM VEZ DE UMA SEQUENCIA
 		public inkQuantities: seq1 of nat := [0, 0]; -- [black&white, color]
 		public paperQuantities: seq1 of nat := [0, 0, 0]; -- [A3, A4, A5]
 		public openReports: seq of Report := []; 
@@ -271,7 +272,6 @@ class Printer
 				exists report in set elems openReports & report.malfunction = malfunction
 			post
 				forall report in set elems openReports & report.malfunction <> malfunction;
-		--PERGUNTAR AO PROFESSOR SE VALE APENA ESTAR A REPETIR POS CONDIÇOES IGUAS EM VARIAS FUNÇOES
 		
 	functions
 		private getInkCartridgeIndex: Document`ColorType -> nat1
@@ -311,20 +311,5 @@ class Printer
 				<A5> -> <A5Empty>
 			end
 		);
-		-- CODE FROM MOODLE STACK EXAMPLE
- --public clear: () ==> ()
- --clear() == contents := [];
- --public push: int ==> ()
- --push(x) == contents := [x] ^ contents
- --pre len contents < capacity
- --post contents = [x] ^ contents~;
- --public pop: () ==> ()
- --pop() == contents := tl contents
- --pre contents <> []
- --post contents = tl contents~;
- --public top: () ==> int
- --top() == return hd contents
- --pre contents <> []
- --post RESULT = hd contents;
  
 end Printer

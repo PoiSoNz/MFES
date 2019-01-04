@@ -34,7 +34,7 @@ class Report
 				closed = false;
 		
 		/*
-			Close a report, which means its problem has been solved, providing the technician responsible for its resolution
+			Close a report, which means its problem has been solved and eliminated from the printer's report list, providing the technician responsible for its resolution
 		*/
 		public close: Technician ==> ()
 		close(technician) ==

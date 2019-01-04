@@ -1,0 +1,80 @@
+class PrintingServiceTest
+
+	instance variables
+		-- Printers
+		p1: Printer := new Printer([50, 50], [50, 50, 50], 'a');
+		p2: Printer := new Printer([10, 10], [10, 10, 10], 'a');
+		p3: Printer := new Printer([3, 10], [3, 10, 50], 'b');
+		-- Documents
+		smallDocument: Document := new Document(<BlackWhite>, <A5>, 2, 5);
+		mediumDocument: Document := new Document(<Color>, <A4>, 5, 10);
+		bigDocument: Document := new Document(<BlackWhite>, <A3>, 10, 20);
+		-- Clients
+		--c1: Client := new Client("Joao");
+		--c2: Client := new Client("Miguel", 20);
+		
+	operations
+		private assertTrue: bool ==> ()
+		assertTrue(cond) == 
+			return
+			pre cond;
+		
+		protected assertEqual: ? * ? ==> ()
+		assertEqual(expected, actual) ==
+		(
+			if expected <> actual then (
+	  			IO`print("Actual value (");
+	  			IO`print(actual); 
+	  			IO`print(") different from expected (");
+	  			IO`print(expected);
+	  			IO`println(")\n")
+			)
+		)
+			post expected = actual;
+		
+		--
+ 		private testClientMoneyDeposit: () ==> ()
+ 		testClientMoneyDeposit() ==
+ 		(
+ 			dcl c1: Client := new Client("Joao");
+			dcl c2: Client := new Client("Miguel", 20);
+			
+ 			assertEqual(c1.moneyBalance, 0);
+ 			c1.moneyDeposit(4);
+ 			assertEqual(c1.moneyBalance, 4);
+ 			c1.moneyDeposit(5);
+ 			assertEqual(c1.moneyBalance, 9);
+ 			
+ 			assertEqual(c2.moneyBalance, 20);
+ 			c2.moneyDeposit(0.5);
+ 			assertEqual(c2.moneyBalance, 20.5);
+ 			c2.moneyDeposit(2.33);
+ 			assertEqual(c2.moneyBalance, 22.83);
+ 			c2.moneyDeposit(10.15);
+ 			assertEqual(c2.moneyBalance, 32.98);
+		);
+		
+		public static main: () ==> ()
+ 		main() ==
+ 		(
+ 			--dcl test1: PrintingServiceTest := new PrintingServiceTest();
+ 			--dcl test2: PrintingServiceTest := new PrintingServiceTest();
+ 			--dcl test3: PrintingServiceTest := new PrintingServiceTest();
+ 			--dcl test4: PrintingServiceTest := new PrintingServiceTest();
+ 			--dcl test5: PrintingServiceTest := new PrintingServiceTest();
+ 			
+ 			new PrintingServiceTest().testClientMoneyDeposit();
+ 			--new PrintingServiceTest().testClientAssignDocuments();
+		);
+		
+		
+ --traces
+ -- test cases will be generated in all possible combinations
+ -- starting with a call of clear followed by one to four pushes of
+ -- values onto the stack
+ -- followed again by one to three pops from the stack.
+ /*PushBeforePop :
+ s.clear();
+ (let x in set {1,2} in s.push(x)){1,4};
+ s.pop(){1,3}*/
+end PrintingServiceTest
