@@ -1,10 +1,7 @@
 class PrintingService
-	
-	types
-		public static PrinterLocation = map Printer to char;
 		
 	instance variables
-		public servicePrinters: PrinterLocation := {|->}; 
+		public static servicePrinters: map Printer to char := {|->}; 
 
 		-- inv ;
 
@@ -25,8 +22,12 @@ class PrintingService
 				printers <> {}
 			post
 				dom servicePrinters = printers;
-
-		public addToQueue: Document * char ==> ()
+		
+		/*
+			Add a document to the queue of a printer in a given location.
+			The printer selection algorithm is based on the one with the smallest queue in that location
+		*/
+		public static addToQueue: Document * char ==> ()
 		addToQueue(document, location) ==
 		(
 			dcl printersFromLocation: set of Printer := getPrintersFromLocation(location);
@@ -34,7 +35,7 @@ class PrintingService
 			for all currPrinter in set printersFromLocation do
 			(
 				if
-					forall printer in set elems servicePrinters & len currPrinter.printingQueue <= len printer.printingQueue -- get a printer with the smallest printing queue
+					forall printer in set printersFromLocation & len currPrinter.printingQueue <= len printer.printingQueue -- get a printer with the smallest printing queue
 				then
 				(
 					currPrinter.addToQueue(document);
@@ -47,10 +48,54 @@ class PrintingService
 			post
 				(exists1 printer in set dom servicePrinters & document in set elems printer.printingQueue) and 
 				(exists1 printer in set dom servicePrinters & document in set elems printer.printingQueue and printer.location = location);
+		
+		/*
+			Add a document to the queue of any printer (not filtered by location)
+			The printer selection algorithm is based on the one with the smallest queue
+		*/		
+		public static addToQueue: Document ==> ()
+		addToQueue(document) ==
+		(
+			dcl allPrinters: set of Printer := dom servicePrinters;
+			
+			for all currPrinter in set allPrinters do
+			(
+				if
+					forall printer in set allPrinters & len currPrinter.printingQueue <= len printer.printingQueue -- get a printer with the smallest printing queue
+				then
+				(
+					currPrinter.addToQueue(document);
+					return
+				)
+			)
+		)
+			pre
+				forall printer in set dom servicePrinters & document not in set elems printer.printingQueue
+			post
+				exists1 printer in set dom servicePrinters & document in set elems printer.printingQueue;
 				
-		-- TODO: ADICIONAR � QUEUE DE UMA IMPRESSORA QUALQUER (N�O RECEBER LOCATION NOS ARGUMENTOS)
+		public static redistributeDocumentQueue: Printer ==> ()
+		redistributeDocumentQueue(printer) ==
+		(
+			dcl printersFromLocation: set of Printer := getPrintersFromLocation(printer.location);
+			for all currPrinter in set printersFromLocation do
+			(
+				if
+					len currPrinter.printingQueue > 1 and currPrinter <> printer and
+					(forall printerI in set printersFromLocation & len currPrinter.printingQueue >= len printerI.printingQueue) -- get a printer with the biggest printing queue
+				then
+				(
+					dcl queueSize: nat := len currPrinter.printingQueue;
+					dcl realocatedDocuments: seq of Document := currPrinter.printingQueue((queueSize div 2)+1,...,queueSize);
+					
+					currPrinter.reduceQueueInHalf();
+					printer.addToQueue(realocatedDocuments);
+					return
+				)
+			)
+		);
 				
-		private getPrintersFromLocation: char ==> set of Printer
+		private static getPrintersFromLocation: char ==> set of Printer
 		getPrintersFromLocation(location) ==
 			return dom (servicePrinters :> {location})
 			pre

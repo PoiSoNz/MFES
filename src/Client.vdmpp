@@ -71,10 +71,10 @@ class Client
 			post
 				moneyBalance = moneyBalance~ + amount;
 
-		public requestPrint: Document * Printer ==> ()
-		requestPrint(document, printer) ==
+		public requestPrint: Document * char ==> ()
+		requestPrint(document, location) ==
 		(
-			printer.addToQueue(document);
+			PrintingService`addToQueue(document, location);
 			document.queued();
 			moneyBalance := moneyBalance - document.price
 		)
@@ -83,7 +83,22 @@ class Client
 				document in set elems documents and
 				moneyBalance >= document.price
 			post
-				document in set elems printer.printingQueue and
+				document.status = <Queued> and
+				moneyBalance~ - moneyBalance = document.price and
+				moneyBalance >= 0;
+				
+		public requestPrint: Document ==> ()
+		requestPrint(document) ==
+		(
+			PrintingService`addToQueue(document);
+			document.queued();
+			moneyBalance := moneyBalance - document.price
+		)
+			pre
+				document.status = <NotPrinted> and
+				document in set elems documents and
+				moneyBalance >= document.price
+			post
 				document.status = <Queued> and
 				moneyBalance~ - moneyBalance = document.price and
 				moneyBalance >= 0;

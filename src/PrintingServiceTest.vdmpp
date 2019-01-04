@@ -58,11 +58,23 @@ class PrintingServiceTest
 		testClientAssignDocuments() ==
 		(
 			dcl client: Client := new Client("Joao");
-			dcl doc: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			dcl doc1: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			dcl doc2: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			dcl doc3: Document := new Document(<BlackWhite>, <A3>, 2, 5);
 			
-			client.assignDocument(doc);
-			assertEqual(doc.owner, client);
-			assertTrue(doc in set elems client.documents);
+			client.assignDocument(doc1);
+			assertEqual(doc1.owner, client);
+			assertTrue(doc1 in set elems client.documents);
+			
+			client.assignDocument(doc2);
+			assertEqual(doc2.owner, client);
+			assertTrue(doc2 in set elems client.documents);
+			
+			client.assignDocument(doc3);
+			assertEqual(doc3.owner, client);
+			assertTrue(doc3 in set elems client.documents);
+			
+			assertTrue({doc1, doc2, doc3} subset elems client.documents);
 		);
 		
 		public static main: () ==> ()
@@ -75,7 +87,7 @@ class PrintingServiceTest
  			--dcl test5: PrintingServiceTest := new PrintingServiceTest();
  			
  			new PrintingServiceTest().testClientMoneyDeposit();
- 			--new PrintingServiceTest().testClientAssignDocuments();
+ 			new PrintingServiceTest().testClientAssignDocuments();
 		);
 		
 		
