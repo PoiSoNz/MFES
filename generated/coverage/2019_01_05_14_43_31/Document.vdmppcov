@@ -55,8 +55,8 @@ class Document
 		public printed: () ==> ()
 		printed() ==
 			status := <Printed>
---			pre
---				status = <Queued>
+			pre
+				status = <Queued>
 			post
 				status = <Printed>;
 						

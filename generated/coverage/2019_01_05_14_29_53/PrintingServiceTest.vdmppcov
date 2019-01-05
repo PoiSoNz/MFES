@@ -108,6 +108,33 @@ class PrintingServiceTest
 			assertTrue({doc2} subset elems printer2.printingQueue);
 		);
 		
+		-- DOCUMENT
+		testDocumentSetOwner: () ==> ()
+		testDocumentSetOwner() ==
+		(
+			dcl doc: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			dcl client: Client := new Client("Joao");
+			
+			doc.setOwner(client);
+			assertEqual(doc.owner, client);
+		);
+		
+		testDocumentColorCostFactor: () ==> ()
+		testDocumentColorCostFactor() ==
+		(
+			dcl doc: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			
+			assertEqual(doc.colorCostFactor(doc.color), 1);
+		);
+		
+		testDocumentSheetCost: () ==> ()
+		testDocumentSheetCost() ==
+		(
+			dcl doc: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			
+			assertEqual(doc.sheetCost(doc.size), 0.07);
+		);
+		
 		-- PRINTER
 		testPrinterAddToQueue: () ==> ()
 		testPrinterAddToQueue() ==
@@ -140,63 +167,11 @@ class PrintingServiceTest
 			assertEqual(len printer.printingQueue, 2);
 		);
 		
-		testRepairDamage: () ==> ()
-		testRepairDamage() ==
-		(
-			dcl printer: Printer := new Printer([50, 50], [50, 50, 50], 'a');
-			
-			printer.damaged := true;
-			printer.repairDamage();
-			assertTrue(not printer.damaged);
-		);
+--		testRepairDamage: () ==> ()
+--		testRepairDamage() ==
+--		(
+--		);
 		
-		testRefillInkCartridge: () ==> ()
-		testRefillInkCartridge() ==
-		(
-			dcl printer: Printer := new Printer([0, 0], [50, 50, 50], 'a');
-			
-			printer.refillInkCartridge(50, 1);
-			printer.refillInkCartridge(25, 2);
-			assertEqual(printer.inkQuantities(1), 50);
-			assertEqual(printer.inkQuantities(2), 25);
-		);
-		
-		testRefillPaperSize: () ==> ()
-		testRefillPaperSize() ==
-		(
-			dcl printer: Printer := new Printer([50, 50], [0, 0, 0], 'a');
-			
-			printer.refillPaperSize(50, 1);
-			printer.refillPaperSize(20, 2);
-			printer.refillPaperSize(30, 3);
-			assertEqual(printer.paperQuantities(1), 50);
-			assertEqual(printer.paperQuantities(2), 20);
-			assertEqual(printer.paperQuantities(3), 30);
-		);
-		
-		testPrintAll: () ==> ()
-		testPrintAll() ==
-		(
-			dcl printer: Printer := new Printer([50, 50], [50, 50, 50], 'a');
-			dcl doc1: Document := new Document(<BlackWhite>, <A3>, 2, 5);
-			dcl doc2: Document := new Document(<Color>, <A4>, 5, 7);
-			dcl doc3: Document := new Document(<Color>, <A3>, 2, 10);
-			dcl doc4: Document := new Document(<BlackWhite>, <A5>, 6, 5);
-			dcl doc5: Document := new Document(<Color>, <A4>, 3, 3);
-			dcl success: bool;
-			
-			printer.addToQueue([doc1, doc2, doc3, doc4, doc5]);
-			success := printer.printAll();
-			
-			assertEqual(doc1.status, <Printed>);
-			assertEqual(doc2.status, <Printed>);
-			assertEqual(doc3.status, <Printed>);
-			assertEqual(doc4.status, <Printed>);
-			assertEqual(doc5.status, <Printed>);
-			assertEqual(len printer.printingQueue, 0);
-			
-		);
-				
 		public static main: () ==> ()
  		main() ==
  		(
@@ -214,10 +189,6 @@ class PrintingServiceTest
  			-- Printer
  			new PrintingServiceTest().testPrinterAddToQueue();
  			new PrintingServiceTest().testReduceQueueInHalf();
- 			new PrintingServiceTest().testRepairDamage();
- 			new PrintingServiceTest().testRefillInkCartridge();
- 			new PrintingServiceTest().testRefillPaperSize();
- 			new PrintingServiceTest().testPrintAll();
 		);
 		
 		
