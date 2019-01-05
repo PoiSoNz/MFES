@@ -1,11 +1,23 @@
 package MFES_Printing_Service;
 
+import java.util.Iterator;
 import java.util.Scanner;
 
 import org.overture.codegen.runtime.SeqUtil;
+import org.overture.codegen.runtime.Utils;
+import org.overture.codegen.runtime.VDMSeq;
+import org.overture.codegen.runtime.VDMSet;
 
 public class Printing_Service_GUI {
 	public static Client client = new Client("MFES Demo client", 10L);
+	public static Client hiddenClient = new Client("Hidden client", 50L);
+			
+	public static Document doc1 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A3Quote.getInstance(), 10, 10);
+	public static Document doc2 = new Document(MFES_Printing_Service.quotes.ColorQuote.getInstance(), MFES_Printing_Service.quotes.A4Quote.getInstance(), 5, 10);
+	public static Document doc3 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A3Quote.getInstance(), 10, 10);
+	public static Document doc4 = new Document(MFES_Printing_Service.quotes.ColorQuote.getInstance(), MFES_Printing_Service.quotes.A4Quote.getInstance(), 5, 10);
+	public static Document doc5 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A5Quote.getInstance(), 3, 3);
+	
 	public static Printer printera1 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'a');
 	public static Printer printera2 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'a');
 	public static Printer printerb1 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'b');
@@ -26,6 +38,15 @@ public class Printing_Service_GUI {
 			String s = scan.next();
 			int i = scan.nextInt();
 		*/
+		
+		PrintingService ps = new PrintingService();
+		
+		client.assignDocument(doc1);
+		hiddenClient.assignDocument(doc2);
+		hiddenClient.assignDocument(doc3);
+		client.assignDocument(doc4);
+		hiddenClient.assignDocument(doc5);
+		
 		int menuShown = MAIN_MENU;
 		while(true) {
 			menuShown = displayMenu(menuShown);
@@ -40,7 +61,8 @@ public class Printing_Service_GUI {
 			return addBalanceMenu();
 		case CREATE_DOCUMENT_MENU:
 			return createDocumentMenu();
-		//case OWNED_DOCUMENTS_MENU:
+		case OWNED_DOCUMENTS_MENU:
+			return showOwnedDocuments();
 		//case SEND_TO_PRINT_QUEUE_MENU:
 		//case CHECK_PRINTERS_MENU:
 		//case EXECUTE_PRINTS_MENU:
@@ -118,6 +140,24 @@ public class Printing_Service_GUI {
 		System.out.println("Print status: " + newDoc.status);
 		
 		return MAIN_MENU;
+	}
+	
+	private static int showOwnedDocuments() {
+		System.out.println("\nOWNED DOCUMENTS");
+		System.out.println(client.name + "'s documents");
+		
+		VDMSet clientDocs = SeqUtil.elems(Utils.copy(client.documents));
+	    for (Iterator it = clientDocs.iterator(); it.hasNext();) {
+	    	Document doc = ((Document) it.next());
+	      	System.out.println("Document ID: " + doc.id);
+			System.out.println("Color type: " + doc.color);
+			System.out.println("Ink quantity: " + doc.inkQuantity);
+			System.out.println("Paper type: " + doc.size);
+			System.out.println("Paper quantity: " + doc.paperQuantity);
+			System.out.println("Print cost: " + Math.round((double) doc.price * 100.0) / 100.0);
+			System.out.println("Print status: " + doc.status + "\n");
+	    }
+	    return MAIN_MENU;
 	}
 	
 	private static int getSelectedOption(int min, int max) {
