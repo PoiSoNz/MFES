@@ -1,0 +1,53 @@
+class Report
+	
+	types
+		public MalfunctionType = <Damaged> | <BlackInkEmpty> | <ColorInkEmpty> |
+														<A3Empty> | <A4Empty> | <A5Empty>;
+	
+	instance variables
+		public static id_count: nat := 1;
+		public id: nat;
+		public malfunction: MalfunctionType;
+		public printer: Printer;
+		public solverTechnician: [Technician] := nil;
+		public closed: bool := false;
+
+		--inv ;
+
+	operations
+		/*
+			Create a report based on the printer and its problem
+		*/
+		public Report: MalfunctionType * Printer ==> Report
+		Report(malfunction_, printer_) ==
+		(
+			id := id_count;
+			id_count := id_count + 1;
+			malfunction := malfunction_;
+			printer := printer_;
+			return self
+		)
+			post
+				id_count = id_count~ + 1 and
+				id = id_count~ and
+				solverTechnician = nil and
+				closed = false;
+		
+		/*
+			Close a report, which means its problem has been solved and eliminated from the printer's report list, providing the technician responsible for its resolution
+		*/
+		public close: Technician ==> ()
+		close(technician) ==
+		(
+			printer.removeReport(malfunction);
+			closed := true;
+			solverTechnician := technician
+		)
+			pre
+				closed = false and
+				solverTechnician = nil
+			post
+				closed = true and
+				solverTechnician = technician;
+ 
+end Report
