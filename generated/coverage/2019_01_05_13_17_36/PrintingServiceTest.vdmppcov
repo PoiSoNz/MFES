@@ -109,14 +109,20 @@ class PrintingServiceTest
 		);
 		
 		-- DOCUMENT
-		testDocumentStatus: () ==> ()
-		testDocumentStatus() ==
+		testDocumentQueued: () ==> ()
+		testDocumentQueued() ==
+		(
+			dcl doc: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			
+			doc.queued();
+			assertEqual(doc.status, <Queued>);
+		);
+		
+		testDocumentPrinted: () ==> ()
+		testDocumentPrinted() ==
 		(
 			dcl doc: Document := new Document(<BlackWhite>, <A3>, 2, 3);
 			
-			assertEqual(doc.status, <NotPrinted>);
-			doc.queued();
-			assertEqual(doc.status, <Queued>);
 			doc.printed();
 			assertEqual(doc.status, <Printed>);
 		);
@@ -169,11 +175,6 @@ class PrintingServiceTest
  			new PrintingServiceTest().testClientMoneyDeposit();
  			new PrintingServiceTest().testClientAssignDocuments();
  			new PrintingServiceTest().testClientRequestPrints();
- 			new PrintingServiceTest().testDocumentStatus();
- 			new PrintingServiceTest().testDocumentSetOwner();
- 			new PrintingServiceTest().testDocumentCalculatePrice();
- 			new PrintingServiceTest().testDocumentColorCostFactor();
- 			new PrintingServiceTest().testDocumentSheetCost();
 		);
 		
 		

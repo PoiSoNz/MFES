@@ -169,7 +169,7 @@ class PrintingServiceTest
  			new PrintingServiceTest().testClientMoneyDeposit();
  			new PrintingServiceTest().testClientAssignDocuments();
  			new PrintingServiceTest().testClientRequestPrints();
- 			new PrintingServiceTest().testDocumentStatus();
+-- 			new PrintingServiceTest().testDocumentStatus();
  			new PrintingServiceTest().testDocumentSetOwner();
  			new PrintingServiceTest().testDocumentCalculatePrice();
  			new PrintingServiceTest().testDocumentColorCostFactor();
