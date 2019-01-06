@@ -106,7 +106,7 @@ public class PrintingService {
     }
   }
 
-  private static VDMSet getPrintersFromLocation(final Character location) {
+  public static VDMSet getPrintersFromLocation(final Character location) {
 
     return MapUtil.dom(
         MapUtil.rngResTo(Utils.copy(PrintingService.servicePrinters), SetUtil.set(location)));

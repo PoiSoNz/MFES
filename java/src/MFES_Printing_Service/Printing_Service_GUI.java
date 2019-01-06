@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.overture.codegen.runtime.SeqUtil;
+import org.overture.codegen.runtime.SetUtil;
 import org.overture.codegen.runtime.Utils;
 import org.overture.codegen.runtime.VDMSeq;
 import org.overture.codegen.runtime.VDMSet;
@@ -25,7 +26,7 @@ public class Printing_Service_GUI {
 	public static Printer printera2 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'a');
 	public static Printer printerb1 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'b');
 	public static Printer printerb2 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'b');
-	public static Printer printerb3 = new Printer(SeqUtil.seq(10L, 10L), SeqUtil.seq(10L, 10L, 10L), 'b');
+	public static Printer printerb3 = new Printer(SeqUtil.seq(10L, 12L), SeqUtil.seq(10L, 13L, 15L), 'b');
 	
 	private static final int MAIN_MENU = 0;
 	private static final int ADD_BALANCE_MENU = 1;
@@ -36,13 +37,14 @@ public class Printing_Service_GUI {
 	private static final int EXECUTE_PRINTS_MENU = 6;
 	
 	public static void main(String[] args) {
-		/* read input:
-			Scanner scan = new Scanner(System.in);
-			String s = scan.next();
-			int i = scan.nextInt();
-		*/
-		
-		PrintingService ps = new PrintingService();
+		//Initialize printing service with printers
+		VDMSet printers = SetUtil.set();
+		printers.add(printera1);
+		printers.add(printera2);
+		printers.add(printerb1);
+		printers.add(printerb2);
+		printers.add(printerb3);	
+		PrintingService ps = new PrintingService(printers);
 		
 		client.assignDocument(doc1);
 		hiddenClient.assignDocument(doc2);
@@ -68,7 +70,8 @@ public class Printing_Service_GUI {
 			return showOwnedDocuments();
 		case SEND_TO_PRINT_QUEUE_MENU:
 			return sendDocumentToPrintQueueMenu();
-		//case CHECK_PRINTERS_MENU:
+		case CHECK_PRINTERS_MENU:
+			return showPrinters();
 		//case EXECUTE_PRINTS_MENU:
 		}
 		return mainMenu();
@@ -82,6 +85,7 @@ public class Printing_Service_GUI {
 		System.out.println("4. Send document to printing queue");
 		//meter numa das impressoras documentos doutro cliente
 		System.out.println("5. Check printers");
+		//printNext ou printAll numa impressora
 		System.out.println("6. Execute prints");
 		System.out.print("Select an option: ");
 		return getSelectedOption(1, 6);
@@ -223,6 +227,46 @@ public class Printing_Service_GUI {
 			client.requestPrint(selectedDoc);
 		
 	    return MAIN_MENU;
+	}
+	
+	private static int showPrinters() {
+		System.out.println("\nPRINTERS");
+		showPrintersFromLocation('a');
+		showPrintersFromLocation('b');
+	    return MAIN_MENU;
+	}
+	
+	private static void showPrintersFromLocation(char loc) {
+		System.out.println("Section " + loc + " printers");
+		
+		VDMSet printers = PrintingService.getPrintersFromLocation(loc);
+	    for (Iterator it = printers.iterator(); it.hasNext();) {
+	    	Printer printer = ((Printer) it.next());
+	    	  
+	      	System.out.println("\tPrinter ID: " + printer.id);
+	      	System.out.println("\tInk quantities: ");
+		      	System.out.println("\t\tBlack & White: " + printer.inkQuantities.get(0));
+				System.out.println("\t\tColor: " + printer.inkQuantities.get(1));
+			System.out.println("\tPaper Quantities");
+				System.out.println("\t\tA3: " + printer.paperQuantities.get(0));
+				System.out.println("\t\tA4: " + printer.paperQuantities.get(1));
+				System.out.println("\t\tA5: " + printer.paperQuantities.get(2));
+			System.out.println("\tMalfunctions: ");
+				VDMSet printerReports = SeqUtil.elems(Utils.copy(printer.openReports));
+				if(printerReports.size() == 0) System.out.println("\t\tThere are no malfunctions");
+			    for (Iterator itRep = printerReports.iterator(); itRep.hasNext();) {
+			    	Report report = ((Report) itRep.next());
+			      	System.out.println("\t\tReport ID: " + report.id + ", Malfunction: " + report.malfunction);
+			    }
+			System.out.print("\tDocuments in printing queue: ");
+				VDMSet printerQueue = SeqUtil.elems(Utils.copy(printer.printingQueue));
+				if(printerQueue.size() == 0) System.out.print("There are no documents in queue");
+			    for (Iterator itQu = printerQueue.iterator(); itQu.hasNext();) {
+			    	Document doc = ((Document) itQu.next());
+			      	System.out.print(doc.id + "  ");
+			    }
+			System.out.println("\n\n");
+	    }
 	}
 	
 	private static int getSelectedOption(int min, int max) {
