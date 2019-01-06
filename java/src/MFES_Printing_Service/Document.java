@@ -44,11 +44,13 @@ public class Document {
   public void queued() {
 
     status = MFES_Printing_Service.quotes.QueuedQuote.getInstance();
+    IO.print("Document with ID " + id + " has been added to a printing queue");
   }
 
   public void printed() {
 
     status = MFES_Printing_Service.quotes.PrintedQuote.getInstance();
+    IO.print("Document with ID " + id + " has been printed");
   }
 
   public void setOwner(final Client client) {

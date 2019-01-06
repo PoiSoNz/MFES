@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.overture.codegen.runtime.MapUtil;
 import org.overture.codegen.runtime.SeqUtil;
 import org.overture.codegen.runtime.SetUtil;
 import org.overture.codegen.runtime.Utils;
@@ -13,7 +14,7 @@ import org.overture.codegen.runtime.VDMSeq;
 import org.overture.codegen.runtime.VDMSet;
 
 public class Printing_Service_GUI {
-	public static Client client = new Client("MFES Demo client", 10.0);
+	public static Client client = new Client("MFES Demo client", 0.5);
 	public static Client hiddenClient = new Client("Hidden client", 50.0);
 			
 	public static Document doc1 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A3Quote.getInstance(), 10, 10);
@@ -21,6 +22,8 @@ public class Printing_Service_GUI {
 	public static Document doc3 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A3Quote.getInstance(), 10, 10);
 	public static Document doc4 = new Document(MFES_Printing_Service.quotes.ColorQuote.getInstance(), MFES_Printing_Service.quotes.A4Quote.getInstance(), 5, 10);
 	public static Document doc5 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A5Quote.getInstance(), 3, 3);
+	public static Document doc6 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A5Quote.getInstance(), 3, 3);
+	public static Document doc7 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A5Quote.getInstance(), 3, 3);
 	
 	public static Printer printera1 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'a');
 	public static Printer printera2 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'a');
@@ -51,6 +54,12 @@ public class Printing_Service_GUI {
 		hiddenClient.assignDocument(doc3);
 		client.assignDocument(doc4);
 		hiddenClient.assignDocument(doc5);
+		hiddenClient.assignDocument(doc6);
+		hiddenClient.assignDocument(doc7);
+		
+		hiddenClient.requestPrint(doc2, 'a');
+		hiddenClient.requestPrint(doc3, 'a');
+		hiddenClient.requestPrint(doc5, 'a');
 		
 		int menuShown = MAIN_MENU;
 		while(true) {
@@ -72,7 +81,8 @@ public class Printing_Service_GUI {
 			return sendDocumentToPrintQueueMenu();
 		case CHECK_PRINTERS_MENU:
 			return showPrinters();
-		//case EXECUTE_PRINTS_MENU:
+		case EXECUTE_PRINTS_MENU:
+			return executePrintsMenu();
 		}
 		return mainMenu();
 	}
@@ -258,14 +268,49 @@ public class Printing_Service_GUI {
 			    	Report report = ((Report) itRep.next());
 			      	System.out.println("\t\tReport ID: " + report.id + ", Malfunction: " + report.malfunction);
 			    }
-			System.out.print("\tDocuments in printing queue: ");
+			System.out.println("\tDocuments in printing queue: ");
 				VDMSet printerQueue = SeqUtil.elems(Utils.copy(printer.printingQueue));
-				if(printerQueue.size() == 0) System.out.print("There are no documents in queue");
+				if(printerQueue.size() == 0) System.out.println("\t\tThere are no documents in queue");
 			    for (Iterator itQu = printerQueue.iterator(); itQu.hasNext();) {
 			    	Document doc = ((Document) itQu.next());
-			      	System.out.print(doc.id + "  ");
+			      	System.out.println("\t\tID: " + doc.id + ", Ink type: " + doc.color + ", Ink quantity: " + doc.inkQuantity + ", Paper type: " + doc.size + ", Paper quantity: " + doc.paperQuantity);
 			    }
-			System.out.println("\n\n");
+			System.out.println("\n");
+	    }
+	}
+	
+	private static int executePrintsMenu() {
+		System.out.println("\nEXECUTE PRINTS");
+		
+		System.out.println("\nIntroduce the ID of the printer you wish to execute the print on (introduce 0 if you want to cancel): ");
+		int printerID = getSelectedOption(0, 5);
+		if(printerID == 0) return MAIN_MENU;
+		
+		System.out.println("\nPRINT operation");
+		System.out.println("1. Print next document");
+		System.out.println("2. Print all documents in queue");
+		System.out.println("3. Cancel and return to main menu");
+		System.out.print("Select an option: ");
+		int printOperation = getSelectedOption(1, 3);
+		if(printOperation == 3) return MAIN_MENU;
+		
+		performPrintOperation(printerID, printOperation);
+		
+	    return MAIN_MENU;
+	}
+	
+	private static void performPrintOperation(int printerID, int operation) {
+		VDMSet printers = MapUtil.dom(Utils.copy(PrintingService.servicePrinters));
+	    for (Iterator it = printers.iterator(); it.hasNext();) {
+	    	Printer printer = ((Printer) it.next());
+	    	
+	    	if(printer.id.intValue() == printerID && operation == 1) {
+	    		printer.printNext();
+	    		return;
+	    	} else if (printer.id.intValue() == printerID && operation == 2) {
+	    		printer.printAll();
+	    		return;
+	    	}
 	    }
 	}
 	

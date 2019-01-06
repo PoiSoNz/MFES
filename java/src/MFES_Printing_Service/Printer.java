@@ -74,16 +74,19 @@ public class Printer {
   private Number generateRandomDamage() {
 
     Number randNum = MATH.rand(99L).longValue() + 1L;
+    IO.print("Random damage number generated (<=10 for damage): " + randNum);
     if (randNum.longValue() <= cg_Utils.DAMAGE_PROBABILITY.longValue()) {
       damaged = true;
       this.createReport(MFES_Printing_Service.quotes.DamagedQuote.getInstance());
+      IO.print("Printer has been damaged");
     }
 
     return randNum;
   }
 
   private Boolean consumePrintingResources(final Document document) {
-
+	IO.print("Attempting to print document with ID " + document.id);
+	  
     Number inkCartridgeIndex = getInkCartridgeIndex(((Object) document.color));
     Number paperSizeIndex = getPaperSizeIndex(((Object) document.size));
     Boolean andResult_38 = false;
@@ -115,11 +118,13 @@ public class Printer {
       if (((Number) Utils.get(inkQuantities, inkCartridgeIndex)).longValue()
           < document.inkQuantity.longValue()) {
         createReport(((Object) inkCartridgeReportType));
+        IO.print("Printer has NOT ENOUGH INK for next print, check reports for more info");
       }
 
       if (((Number) Utils.get(paperQuantities, paperSizeIndex)).longValue()
           < document.paperQuantity.longValue()) {
         createReport(((Object) paperSizeReportType));
+        IO.print("Printer has NOT ENOUGH PAPER for next print, check reports for more info");
       }
 
       return false;
@@ -140,12 +145,13 @@ public class Printer {
 
     canBePrinted = this.consumePrintingResources(((Document) printingQueue.get(0)));
     if (canBePrinted) {
-      Number generatedNumber = this.generateRandomDamage();
       Document printingDocument = ((Document) printingQueue.get(0));
       printingDocument.printed();
+      Number generatedNumber = this.generateRandomDamage();
       printingQueue = SeqUtil.tail(Utils.copy(printingQueue));
       if (Utils.equals(printingQueue.size(), 0L)) {
         PrintingService.redistributeDocumentQueue(this);
+        IO.print("This printer's queue is empty, trying to redistribute another printer's queue");
       }
     }
 
@@ -170,7 +176,7 @@ public class Printer {
             return true;
 
           } else {
-            IO.print("An error occurred. Check the reports for details!");
+            IO.print("Couldn't print all documents in the queue");
             return false;
           }
         }

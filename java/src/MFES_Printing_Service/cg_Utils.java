@@ -14,5 +14,5 @@ public interface cg_Utils {
   public static final Number A4_PAPER_IDX = 2L;
   public static final Number A5_PAPER_IDX = 3L;
   public static final Number PAPER_TYPES_NUM = 3L;
-  public static final Number DAMAGE_PROBABILITY = 80L;
+  public static final Number DAMAGE_PROBABILITY = 10L;
 }
