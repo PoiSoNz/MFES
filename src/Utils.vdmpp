@@ -13,7 +13,7 @@ class Utils
 		public A5_PAPER_IDX = 3;
 		public PAPER_TYPES_NUM = 3;
 		-- Printer damage
-		public DAMAGE_PROBABILITY = 80;
+		public DAMAGE_PROBABILITY = 5;
 		
 	types
 		public String = seq1 of char;

@@ -199,6 +199,12 @@ class PrintingServiceTest
 			client.requestPrint(doc4);
 			client.requestPrint(doc5);
 			
+			assertEqual(doc1.status, <Queued>);
+			assertEqual(doc2.status, <Queued>);
+			assertEqual(doc3.status, <Queued>);
+			assertEqual(doc4.status, <Queued>);
+			assertEqual(doc5.status, <Queued>);
+			
 			success := printer.printAll();
 			
 			assertEqual(doc1.status, <Printed>);
