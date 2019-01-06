@@ -94,7 +94,9 @@ class PrintingService
 					return
 				)
 			)
-		);
+		)
+			pre
+				printer in set dom servicePrinters;
 				
 		private static getPrintersFromLocation: char ==> set of Printer
 		getPrintersFromLocation(location) ==
