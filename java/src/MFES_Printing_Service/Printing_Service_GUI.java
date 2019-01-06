@@ -14,7 +14,7 @@ import org.overture.codegen.runtime.VDMSeq;
 import org.overture.codegen.runtime.VDMSet;
 
 public class Printing_Service_GUI {
-	public static Client client = new Client("MFES Demo client", 10.5);
+	public static Client client = new Client("MFES Demo client", 0.5);
 	public static Client hiddenClient = new Client("Hidden client", 50.0);
 			
 	public static Document doc1 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A3Quote.getInstance(), 10, 10);
@@ -25,7 +25,7 @@ public class Printing_Service_GUI {
 	public static Document doc6 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A5Quote.getInstance(), 3, 3);
 	public static Document doc7 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A5Quote.getInstance(), 3, 3);
 	
-	public static Printer printera1 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'a');
+	public static Printer printera1 = new Printer(SeqUtil.seq(10L, 10L), SeqUtil.seq(10L, 10L, 10L), 'a');
 	public static Printer printera2 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'a');
 	public static Printer printerb1 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'b');
 	public static Printer printerb2 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'b');
@@ -90,8 +90,8 @@ public class Printing_Service_GUI {
 			return executePrintsMenu();
 		case CHECK_TECHNICIANS_MENU:
 			return showTechnicians();
-		//case SEND_TECHNICIAN_TO_FIX_MENU:
-			//return sendTechnicianTOFixMenu();
+		case SEND_TECHNICIAN_TO_FIX_MENU:
+			return sendTechnicianToFixMenu();
 		}
 		return mainMenu();
 	}
@@ -345,8 +345,50 @@ public class Printing_Service_GUI {
 	    for (Iterator it = technicianReports.iterator(); it.hasNext();) {
 	    	Report fixedReport = ((Report) it.next());
 	    		    	
-	      	System.out.println("\tReport ID: " + fixedReport.id + ", printer ID" + fixedReport.printer.id + ", malfunction: " + fixedReport.malfunction);
+	      	System.out.println("\tReport ID: " + fixedReport.id + ", printer ID: " + fixedReport.printer.id + ", malfunction: " + fixedReport.malfunction);
 	    }
+	}
+	
+	private static int sendTechnicianToFixMenu() {
+		System.out.println("\nSEND TECHNICIAN TO FIX MALFUNCTION");
+		
+		ArrayList<Integer> reportIDs = new ArrayList<Integer>();
+		Map<Integer, Report> reportToId = new HashMap<Integer, Report>();
+		
+		VDMSet printers = MapUtil.dom(Utils.copy(PrintingService.servicePrinters));
+	    for (Iterator it = printers.iterator(); it.hasNext();) {
+	    	Printer printer = ((Printer) it.next());
+	    	
+			VDMSet printerReports = SeqUtil.elems(Utils.copy(printer.openReports));
+		    for (Iterator itRep = printerReports.iterator(); itRep.hasNext();) {
+		    	Report report = ((Report) itRep.next());
+		    	
+		    	reportIDs.add(Long.valueOf((long)report.id).intValue());
+		    	reportToId.put(Long.valueOf((long)report.id).intValue(), report);
+		    }
+	    }
+	    
+	    reportIDs.add(0);
+	    System.out.println("\nIntroduce the ID of the report you wish to fix (introduce 0 if you want to cancel): ");
+		int selectedReportID = getIntroducedAmongst(reportIDs);
+		if(selectedReportID == 0) return MAIN_MENU;
+		
+		Report selectedReport = reportToId.get(selectedReportID);
+		
+		System.out.println("\nSelect the TECHNICIAN to fix the report");
+		System.out.println("1. Technician ID: " + technician1.id + ", Name: " + technician1.name);
+		System.out.println("2. Technician ID: " + technician2.id + ", Name: " + technician2.name);
+		System.out.println("3. Cancel and return to main menu");
+		System.out.print("Select an option: ");
+		int selecteTechnicianID = getSelectedOption(1, 3);
+		if(selecteTechnicianID == 3) return MAIN_MENU;
+		
+		if(selecteTechnicianID == 1)
+			technician1.fixPrinterProblem(selectedReport);
+		else if(selecteTechnicianID == 2)
+			technician2.fixPrinterProblem(selectedReport);
+			
+		return MAIN_MENU;
 	}
 	
 	private static int getSelectedOption(int min, int max) {
