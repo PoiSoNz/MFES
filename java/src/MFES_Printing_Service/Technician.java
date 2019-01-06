@@ -7,9 +7,9 @@ import org.overture.codegen.runtime.*;
 public class Technician {
   private static final Number INK_REFILL_QUANTITY = 25L;
   private static Number id_count = 1L;
-  private Number id;
-  private String name;
-  private VDMSeq fixedReports = SeqUtil.seq();
+  public Number id;
+  public String name;
+  public VDMSeq fixedReports = SeqUtil.seq();
 
   public void cg_init_Technician_1(final String name_) {
 

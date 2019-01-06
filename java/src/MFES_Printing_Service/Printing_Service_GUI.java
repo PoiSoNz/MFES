@@ -14,7 +14,7 @@ import org.overture.codegen.runtime.VDMSeq;
 import org.overture.codegen.runtime.VDMSet;
 
 public class Printing_Service_GUI {
-	public static Client client = new Client("MFES Demo client", 0.5);
+	public static Client client = new Client("MFES Demo client", 10.5);
 	public static Client hiddenClient = new Client("Hidden client", 50.0);
 			
 	public static Document doc1 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A3Quote.getInstance(), 10, 10);
@@ -31,6 +31,9 @@ public class Printing_Service_GUI {
 	public static Printer printerb2 = new Printer(SeqUtil.seq(50L, 50L), SeqUtil.seq(50L, 50L, 50L), 'b');
 	public static Printer printerb3 = new Printer(SeqUtil.seq(10L, 12L), SeqUtil.seq(10L, 13L, 15L), 'b');
 	
+	public static Technician technician1 = new Technician("Tech John");
+	public static Technician technician2 = new Technician("Tech Alfred");
+	
 	private static final int MAIN_MENU = 0;
 	private static final int ADD_BALANCE_MENU = 1;
 	private static final int CREATE_DOCUMENT_MENU = 2;
@@ -38,6 +41,8 @@ public class Printing_Service_GUI {
 	private static final int SEND_TO_PRINT_QUEUE_MENU = 4;
 	private static final int CHECK_PRINTERS_MENU = 5;
 	private static final int EXECUTE_PRINTS_MENU = 6;
+	private static final int CHECK_TECHNICIANS_MENU = 7;
+	private static final int SEND_TECHNICIAN_TO_FIX_MENU = 8;
 	
 	public static void main(String[] args) {
 		//Initialize printing service with printers
@@ -83,6 +88,10 @@ public class Printing_Service_GUI {
 			return showPrinters();
 		case EXECUTE_PRINTS_MENU:
 			return executePrintsMenu();
+		case CHECK_TECHNICIANS_MENU:
+			return showTechnicians();
+		//case SEND_TECHNICIAN_TO_FIX_MENU:
+			//return sendTechnicianTOFixMenu();
 		}
 		return mainMenu();
 	}
@@ -93,12 +102,12 @@ public class Printing_Service_GUI {
 		System.out.println("2. Create document");
 		System.out.println("3. Check owned documents");
 		System.out.println("4. Send document to printing queue");
-		//meter numa das impressoras documentos doutro cliente
 		System.out.println("5. Check printers");
-		//printNext ou printAll numa impressora
 		System.out.println("6. Execute prints");
+		System.out.println("7. Check technicians");
+		System.out.println("8. Send technician to fix report");
 		System.out.print("Select an option: ");
-		return getSelectedOption(1, 6);
+		return getSelectedOption(1, 8);
 	}
 	
 	private static int addBalanceMenu() {
@@ -311,6 +320,32 @@ public class Printing_Service_GUI {
 	    		printer.printAll();
 	    		return;
 	    	}
+	    }
+	}
+	
+	private static int showTechnicians() {
+		System.out.println("\nTECHNICIANS");
+		showTechnician(technician1);
+		System.out.println("");
+		showTechnician(technician2);
+		System.out.println("");
+	    return MAIN_MENU;
+	}
+	
+	private static void showTechnician(Technician tech) {
+
+      	System.out.println("Technician ID: " + tech.id);
+		System.out.println("Name: " + tech.name);
+		System.out.println("Fixed reports: ");
+		VDMSet technicianReports = SeqUtil.elems(Utils.copy(tech.fixedReports));
+		if(technicianReports.size() == 0) {
+	    	System.out.println("\tNo reports were fixed by this technician");
+	    	return;
+	    }
+	    for (Iterator it = technicianReports.iterator(); it.hasNext();) {
+	    	Report fixedReport = ((Report) it.next());
+	    		    	
+	      	System.out.println("\tReport ID: " + fixedReport.id + ", printer ID" + fixedReport.printer.id + ", malfunction: " + fixedReport.malfunction);
 	    }
 	}
 	
