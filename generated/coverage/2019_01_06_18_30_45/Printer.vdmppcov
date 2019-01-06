@@ -218,12 +218,15 @@ class Printer
 		)
 			post
 				(RESULT = true and 
-					hd printingQueue~ not in set elems printingQueue) -- Ensures the other elements of the queue are still in the same order
+					(hd printingQueue~).status = <Printed> and
+					hd printingQueue~ not in set elems printingQueue and
+					len printingQueue = len printingQueue~ - 1 and
+					forall idx in set inds printingQueue & printingQueue(idx) = (tl printingQueue~)(idx)) -- Ensures the other elements of the queue are still in the same order
 				or
 				(RESULT = false and
 					len printingQueue = len printingQueue~ and
 					forall idx in set inds printingQueue & printingQueue(idx) = printingQueue~(idx)); -- Ensures the queue order was not changed
-
+		
 		/*
 			Tries to print all the documents existing in the printing queue, respecting FIFO order. Returns true if all were printed, false otherwise
 			If somewhere in the queue a document was not printed due to lack of resources, at least one report should exist trying to increase the resources available for printing the document
@@ -251,7 +254,7 @@ class Printer
 					)
 					else
 					(
-						IO`print("\nAn error occurred. Check the reports for details!");
+						IO`print("An error occurred. Check the reports for details!");
 						return false
 					)
 				)

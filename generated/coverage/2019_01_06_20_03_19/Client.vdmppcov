@@ -1,0 +1,109 @@
+class Client
+	/*
+		Represents a client that can own documents and print them by using its money balance
+	*/
+	
+	instance variables
+		public static id_count: nat := 1;
+		public id: nat;
+		public name: Utils`String;
+		public moneyBalance: real := 0;
+		public documents: seq of Document := [];
+
+		inv moneyBalance >= 0;
+
+	operations
+		/*
+			Create a client providing a positive starting money balance
+		*/
+		public Client: Utils`String * real ==> Client
+		Client(name_, startingMoneyBalance) ==
+		(
+			id := id_count;
+			id_count := id_count + 1;
+			name := name_;
+			moneyBalance := startingMoneyBalance;
+			return self
+		)
+			pre
+				startingMoneyBalance > 0
+			post
+				id_count = id_count~ + 1 and
+				id = id_count~ and
+				moneyBalance = startingMoneyBalance and
+				documents = [];
+		
+		/*
+			Create a client with no money balance (zero)
+		*/
+		public Client: Utils`String ==> Client
+		Client(name_) ==
+		(
+			id := id_count;
+			id_count := id_count + 1;
+			name := name_;
+			moneyBalance := 0;
+			return self
+		)
+			post
+				id_count = id_count~ + 1 and
+				id = id_count~ and
+				moneyBalance = 0 and
+				documents = [];
+				
+		--assignDocument
+		-- adiciona documento a documents, e faz setOwner nesse documento
+ 		public assignDocument: Document ==> ()
+		assignDocument(document) ==
+		(
+			documents := documents ^ [document];
+			document.setOwner(self);
+		)
+			pre
+				document not in set elems documents
+			post
+				document.owner = self and
+				document in set elems documents and
+				len documents = len documents~ + 1;
+				
+		public moneyDeposit: real ==> ()
+		moneyDeposit(amount) ==
+			moneyBalance := moneyBalance + amount
+			pre
+				amount > 0
+			post
+				moneyBalance = moneyBalance~ + amount;
+
+		public requestPrint: Document * char ==> ()
+		requestPrint(document, location) ==
+		(
+			PrintingService`addToQueue(document, location);
+			document.queued();
+			moneyBalance := moneyBalance - document.price
+		)
+			pre
+				document.status = <NotPrinted> and
+				document in set elems documents and
+				moneyBalance >= document.price
+			post
+				document.status = <Queued> and
+				moneyBalance = moneyBalance~ - document.price and
+				moneyBalance >= 0;
+				
+		public requestPrint: Document ==> ()
+		requestPrint(document) ==
+		(
+			PrintingService`addToQueue(document);
+			document.queued();
+			moneyBalance := moneyBalance - document.price
+		)
+			pre
+				document.status = <NotPrinted> and
+				document in set elems documents and
+				moneyBalance >= document.price
+			post
+				document.status = <Queued> and
+				moneyBalance = moneyBalance~ - document.price and
+				moneyBalance >= 0;
+		
+end Client

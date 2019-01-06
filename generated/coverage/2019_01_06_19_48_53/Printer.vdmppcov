@@ -251,7 +251,7 @@ class Printer
 					)
 					else
 					(
-						IO`print("\nAn error occurred. Check the reports for details!");
+						IO`print("An error occurred. Check the reports for details!");
 						return false
 					)
 				)

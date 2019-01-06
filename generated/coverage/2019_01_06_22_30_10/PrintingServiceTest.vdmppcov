@@ -236,25 +236,6 @@ class PrintingServiceTest
 			assertTrue(report not in set elems printer.openReports);
 		);
 		
-		testReports: () ==>  ()
-		testReports() ==
-		(
-			dcl printer: Printer := new Printer([0, 0], [0, 0, 0], 'a');
-			dcl service: PrintingService := new PrintingService({printer});
-			dcl client: Client := new Client("Joao", 50);
-			dcl document: Document := new Document(<BlackWhite>, <A3>, 2, 5);
-			dcl success: bool;
-			
-			client.assignDocument(document);
-			client.requestPrint(document);
-			assertEqual(document.status, <Queued>);
-			
-			success := printer.printNext();
-			
-			assertTrue(printer.openReports(1).malfunction = <BlackInkEmpty>);
-			assertTrue(printer.openReports(2).malfunction = <A3Empty>);
-		);
-		
 		-- Technician
 		testFixPrinterProblem: () ==> ()
 		testFixPrinterProblem() ==
@@ -328,7 +309,6 @@ class PrintingServiceTest
  			new PrintingServiceTest().testRefillPaperSize();
  			new PrintingServiceTest().testPrintAll();
  			new PrintingServiceTest().testRemoveReport();
- 			new PrintingServiceTest().testReports();
  			
  			-- Technician
  			new PrintingServiceTest().testFixPrinterProblem();
