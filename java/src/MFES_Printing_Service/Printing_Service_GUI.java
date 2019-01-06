@@ -1,6 +1,9 @@
 package MFES_Printing_Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.overture.codegen.runtime.SeqUtil;
@@ -9,8 +12,8 @@ import org.overture.codegen.runtime.VDMSeq;
 import org.overture.codegen.runtime.VDMSet;
 
 public class Printing_Service_GUI {
-	public static Client client = new Client("MFES Demo client", 10L);
-	public static Client hiddenClient = new Client("Hidden client", 50L);
+	public static Client client = new Client("MFES Demo client", 10.0);
+	public static Client hiddenClient = new Client("Hidden client", 50.0);
 			
 	public static Document doc1 = new Document(MFES_Printing_Service.quotes.BlackWhiteQuote.getInstance(), MFES_Printing_Service.quotes.A3Quote.getInstance(), 10, 10);
 	public static Document doc2 = new Document(MFES_Printing_Service.quotes.ColorQuote.getInstance(), MFES_Printing_Service.quotes.A4Quote.getInstance(), 5, 10);
@@ -63,7 +66,8 @@ public class Printing_Service_GUI {
 			return createDocumentMenu();
 		case OWNED_DOCUMENTS_MENU:
 			return showOwnedDocuments();
-		//case SEND_TO_PRINT_QUEUE_MENU:
+		case SEND_TO_PRINT_QUEUE_MENU:
+			return sendDocumentToPrintQueueMenu();
 		//case CHECK_PRINTERS_MENU:
 		//case EXECUTE_PRINTS_MENU:
 		}
@@ -160,6 +164,67 @@ public class Printing_Service_GUI {
 	    return MAIN_MENU;
 	}
 	
+	private static int sendDocumentToPrintQueueMenu() {
+		System.out.println("\nSEND DOCUMENT TO PRINTING QUEUE");
+		System.out.println(client.name + "'s documents eligible to be added to a printing queue");
+		
+		ArrayList<Integer> documentIDs = new ArrayList<Integer>();
+		Map<Integer, Document> docToId = new HashMap<Integer, Document>();
+		
+		VDMSet clientDocs = SeqUtil.elems(Utils.copy(client.documents));
+	    for (Iterator it = clientDocs.iterator(); it.hasNext();) {
+	    	Document doc = ((Document) it.next());
+	    	
+	    	if(doc.status != MFES_Printing_Service.quotes.NotPrintedQuote.getInstance())
+	    		continue;
+	    	
+	    	documentIDs.add(Long.valueOf((long)doc.id).intValue());
+	    	docToId.put(Long.valueOf((long)doc.id).intValue(), doc);
+	    	
+	      	System.out.println("Document ID: " + doc.id);
+			System.out.println("Color type: " + doc.color);
+			System.out.println("Ink quantity: " + doc.inkQuantity);
+			System.out.println("Paper type: " + doc.size);
+			System.out.println("Paper quantity: " + doc.paperQuantity);
+			System.out.println("Print cost: " + Math.round((double) doc.price * 100.0) / 100.0);
+			System.out.println("\n");
+	    }
+	    if(documentIDs.size() == 0) {
+	    	System.out.println("You have no documents eligible to be added to a printing queue");
+	    	return MAIN_MENU;
+	    }
+	    
+	    documentIDs.add(0);
+	    System.out.println("\nIntroduce the ID of the document you wish to send to the printing queue (introduce 0 if you want to cancel): ");
+		int selectedDocID = getIntroducedAmongst(documentIDs);
+		if(selectedDocID == 0) return MAIN_MENU;
+		
+		Document selectedDoc = docToId.get(selectedDocID);
+		
+		if(client.moneyBalance.doubleValue() < selectedDoc.price.doubleValue()) {
+			System.out.println("You don't have enough money balance to add this document to printing queue");
+			return MAIN_MENU;
+		}
+		
+		System.out.println("What location do you want the printer to be in");
+		System.out.println("1. Section a");
+		System.out.println("2. Section b");
+		System.out.println("3. Anywhere");
+		System.out.println("4. Cancel and return to main menu");
+		System.out.print("Select an option: ");
+		int input = getSelectedOption(1, 4);
+		if(input == 4) return MAIN_MENU;
+		
+		if(input == 1)
+			client.requestPrint(selectedDoc, 'a');
+		else if(input == 2)
+			client.requestPrint(selectedDoc, 'b');
+		else
+			client.requestPrint(selectedDoc);
+		
+	    return MAIN_MENU;
+	}
+	
 	private static int getSelectedOption(int min, int max) {
 		Scanner scan = new Scanner(System.in);
 		int input = scan.nextInt();
@@ -178,5 +243,15 @@ public class Printing_Service_GUI {
 		if(input > max)
 			return max;
 		return input;
+	}
+	
+	private static int getIntroducedAmongst(ArrayList<Integer> possibilities) {
+		while(true){
+			Scanner scan = new Scanner(System.in);
+			int input = scan.nextInt();
+			if(possibilities.contains(input))
+				return input;
+			System.out.println("Invalid value! Try again: ");
+		}
 	}
 }
