@@ -76,7 +76,7 @@ public class Printing_Service_GUI {
 	
 	private static int mainMenu() {
 		System.out.println("\nMAIN MENU");
-		System.out.println("1. Add money balance (Current Balance: " + client.moneyBalance + ")");
+		System.out.println("1. Add money balance (Current Balance: " + Math.round((double) client.moneyBalance * 100.0) / 100.0 + ")");
 		System.out.println("2. Create document");
 		System.out.println("3. Check owned documents");
 		System.out.println("4. Send document to printing queue");
