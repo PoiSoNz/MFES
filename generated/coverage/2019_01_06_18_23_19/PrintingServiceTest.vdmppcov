@@ -206,7 +206,6 @@ class PrintingServiceTest
 			assertEqual(doc3.status, <Printed>);
 			assertEqual(doc4.status, <Printed>);
 			assertEqual(doc5.status, <Printed>);
-			assertEqual(len printer.printingQueue, 0);
 			
 		);
 				
