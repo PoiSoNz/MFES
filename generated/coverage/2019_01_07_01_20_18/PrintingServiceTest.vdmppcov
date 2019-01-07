@@ -255,6 +255,57 @@ class PrintingServiceTest
 			assertTrue(printer.openReports(2).malfunction = <A3Empty>);
 		);
 		
+		testRedistributeDocumentQueue: () ==> ()
+		testRedistributeDocumentQueue() ==
+		(
+			dcl printer1: Printer := new Printer([50, 50], [50, 50, 50], 'a');
+			dcl printer2: Printer := new Printer([50, 50], [50, 50, 50], 'b');
+			dcl service: PrintingService := new PrintingService({printer1, printer2});
+			
+			dcl client: Client := new Client("Joao", 500);
+			
+			dcl document0: Document := new Document(<Color>, <A3>, 2, 5);
+			dcl document1: Document := new Document(<BlackWhite>, <A4>, 2, 5);
+			dcl document2: Document := new Document(<Color>, <A5>, 2, 5);
+			dcl document3: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+			dcl document4: Document := new Document(<Color>, <A4>, 2, 5);
+			dcl document5: Document := new Document(<BlackWhite>, <A5>, 2, 5);
+			dcl document6: Document := new Document(<Color>, <A3>, 2, 5);
+			dcl document7: Document := new Document(<BlackWhite>, <A4>, 2, 5);
+			dcl document8: Document := new Document(<Color>, <A5>, 2, 5);
+			dcl document9: Document := new Document(<BlackWhite>, <A5>, 2, 5);
+			
+			client.assignDocument(document0);
+			client.assignDocument(document1);
+			client.assignDocument(document2);
+			client.assignDocument(document3);
+			client.assignDocument(document4);
+			client.assignDocument(document5);
+			client.assignDocument(document6);
+			client.assignDocument(document7);
+			client.assignDocument(document8);
+			client.assignDocument(document9);
+			
+			client.requestPrint(document0, 'a');
+			client.requestPrint(document1, 'a');
+			client.requestPrint(document2, 'a');
+			client.requestPrint(document3, 'a');
+			client.requestPrint(document4, 'a');
+			client.requestPrint(document5, 'a');
+			client.requestPrint(document6, 'a');
+			client.requestPrint(document7, 'a');
+			client.requestPrint(document8, 'a');
+			client.requestPrint(document9, 'a');
+			
+			printer2.location := 'a';
+			
+			service.redistributeDocumentQueue(printer2);
+			
+			assertEqual(len printer1.printingQueue, 5);
+			assertEqual(len printer2.printingQueue, 5);
+		
+		);
+		
 		-- Technician
 		testFixPrinterProblem: () ==> ()
 		testFixPrinterProblem() ==
@@ -329,19 +380,10 @@ class PrintingServiceTest
  			new PrintingServiceTest().testPrintAll();
  			new PrintingServiceTest().testRemoveReport();
  			new PrintingServiceTest().testReports();
+ 			new PrintingServiceTest().testRedistributeDocumentQueue();
  			
  			-- Technician
  			new PrintingServiceTest().testFixPrinterProblem();
 		);
-		
-		
- --traces
- -- test cases will be generated in all possible combinations
- -- starting with a call of clear followed by one to four pushes of
- -- values onto the stack
- -- followed again by one to three pops from the stack.
- /*PushBeforePop :
- s.clear();
- (let x in set {1,2} in s.push(x)){1,4};
- s.pop(){1,3}*/
+
 end PrintingServiceTest
