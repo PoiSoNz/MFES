@@ -1,6 +1,6 @@
 class Client
 	/*
-		Represents a client that can own documents and print them by using its money balance
+		Defines a client that can own documents and order them to be printed using its money balance
 	*/
 	
 	instance variables
@@ -51,8 +51,9 @@ class Client
 				moneyBalance = 0 and
 				documents = [];
 				
-		--assignDocument
-		-- adiciona documento a documents, e faz setOwner nesse documento
+		/*
+			Add a document to the client's documents array and set the client as the owner of the document
+		*/
  		public assignDocument: Document ==> ()
 		assignDocument(document) ==
 		(
@@ -65,7 +66,10 @@ class Client
 				document.owner = self and
 				document in set elems documents and
 				len documents = len documents~ + 1;
-				
+		
+		/*
+			Add an amount to the client's money balance
+		*/		
 		public moneyDeposit: real ==> ()
 		moneyDeposit(amount) ==
 			moneyBalance := moneyBalance + amount
@@ -73,7 +77,11 @@ class Client
 				amount > 0
 			post
 				moneyBalance = moneyBalance~ + amount;
-
+		
+		/*
+			Request a document to be added to the printing queue of a printer in a given location
+			Document price gets deducted from the client's money balance
+		*/
 		public requestPrint: Document * char ==> ()
 		requestPrint(document, location) ==
 		(
@@ -89,7 +97,11 @@ class Client
 				document.status = <Queued> and
 				moneyBalance = moneyBalance~ - document.price and
 				moneyBalance >= 0;
-				
+		
+		/*
+			Request a document to be added to the printing queue of a printer in any location
+			Document price gets deducted from the client's money balance
+		*/		
 		public requestPrint: Document ==> ()
 		requestPrint(document) ==
 		(

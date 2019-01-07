@@ -1,20 +1,9 @@
 class PrintingServiceTest
 	/*
-		Class responsible for testing the printing service system
+		Defines the test/usage scenarios and test cases for the Printing Service. Also defines assert true and assert equal testing functions
 	*/
 	
 	instance variables
-		-- Printers
-		p1: Printer := new Printer([50, 50], [50, 50, 50], 'a');
-		p2: Printer := new Printer([10, 10], [10, 10, 10], 'a');
-		p3: Printer := new Printer([3, 10], [3, 10, 50], 'b');
-		-- Documents
-		smallDocument: Document := new Document(<BlackWhite>, <A5>, 2, 5);
-		mediumDocument: Document := new Document(<Color>, <A4>, 5, 10);
-		bigDocument: Document := new Document(<BlackWhite>, <A3>, 10, 20);
-		-- Clients
-		--c1: Client := new Client("Joao");
-		--c2: Client := new Client("Miguel", 20);
 		
 	operations
 		private assertTrue: bool ==> ()
@@ -259,50 +248,30 @@ class PrintingServiceTest
 		testRedistributeDocumentQueue() ==
 		(
 			dcl printer1: Printer := new Printer([50, 50], [50, 50, 50], 'a');
-			dcl printer2: Printer := new Printer([50, 50], [50, 50, 50], 'b');
+			dcl printer2: Printer := new Printer([50, 50], [50, 50, 50], 'a');
 			dcl service: PrintingService := new PrintingService({printer1, printer2});
-			
+			dcl flag: bool;
 			dcl client: Client := new Client("Joao", 500);
 			
-			dcl document0: Document := new Document(<Color>, <A3>, 2, 5);
-			dcl document1: Document := new Document(<BlackWhite>, <A4>, 2, 5);
-			dcl document2: Document := new Document(<Color>, <A5>, 2, 5);
-			dcl document3: Document := new Document(<BlackWhite>, <A3>, 2, 5);
-			dcl document4: Document := new Document(<Color>, <A4>, 2, 5);
-			dcl document5: Document := new Document(<BlackWhite>, <A5>, 2, 5);
-			dcl document6: Document := new Document(<Color>, <A3>, 2, 5);
-			dcl document7: Document := new Document(<BlackWhite>, <A4>, 2, 5);
-			dcl document8: Document := new Document(<Color>, <A5>, 2, 5);
-			dcl document9: Document := new Document(<BlackWhite>, <A5>, 2, 5);
+			dcl document0: Document := new Document(<Color>, <A3>, 1, 1);
+			dcl document1: Document := new Document(<BlackWhite>, <A4>, 1, 1);
+			dcl document2: Document := new Document(<Color>, <A5>, 1, 1);
+			dcl document3: Document := new Document(<BlackWhite>, <A3>, 1, 1);
 			
 			client.assignDocument(document0);
 			client.assignDocument(document1);
 			client.assignDocument(document2);
 			client.assignDocument(document3);
-			client.assignDocument(document4);
-			client.assignDocument(document5);
-			client.assignDocument(document6);
-			client.assignDocument(document7);
-			client.assignDocument(document8);
-			client.assignDocument(document9);
 			
 			client.requestPrint(document0, 'a');
 			client.requestPrint(document1, 'a');
 			client.requestPrint(document2, 'a');
 			client.requestPrint(document3, 'a');
-			client.requestPrint(document4, 'a');
-			client.requestPrint(document5, 'a');
-			client.requestPrint(document6, 'a');
-			client.requestPrint(document7, 'a');
-			client.requestPrint(document8, 'a');
-			client.requestPrint(document9, 'a');
 			
-			printer2.location := 'a';
+			flag := printer1.printAll();
 			
-			service.redistributeDocumentQueue(printer2);
-			
-			assertEqual(len printer1.printingQueue, 5);
-			assertEqual(len printer2.printingQueue, 5);
+			assertEqual(len printer1.printingQueue, 0);
+			assertEqual(len printer2.printingQueue, 1);
 		
 		);
 		
@@ -356,16 +325,40 @@ class PrintingServiceTest
 			assertEqual(printer.paperQuantities(3), Utils`PAPER_REFILL_QUANTITY);
 			
 		);
+		
+		testPrintWhileDamaged: () ==> ()
+		testPrintWhileDamaged() ==
+		(			
+			dcl flag: bool := true;
+			
+			while flag do
+			(
+				dcl client: Client := new Client("Joao", 10);
+				dcl doc1: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+				dcl doc2: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+				dcl printer: Printer := new Printer([50, 50], [50, 50, 50], 'a');
+				dcl ps: PrintingService := new PrintingService({printer});
 				
+				client.assignDocument(doc1);
+				client.assignDocument(doc2);
+				client.requestPrint(doc1);
+				client.requestPrint(doc2);
+				
+				flag := printer.printNext();
+				
+				if
+					printer.damaged
+				then
+				(
+					flag := printer.printNext();
+					assertEqual(printer.damaged, true);
+				)
+			)
+		);
+		
 		public static main: () ==> ()
  		main() ==
  		(
- 			--dcl test1: PrintingServiceTest := new PrintingServiceTest();
- 			--dcl test2: PrintingServiceTest := new PrintingServiceTest();
- 			--dcl test3: PrintingServiceTest := new PrintingServiceTest();
- 			--dcl test4: PrintingServiceTest := new PrintingServiceTest();
- 			--dcl test5: PrintingServiceTest := new PrintingServiceTest();
- 			
  			-- Client
  			new PrintingServiceTest().testClientMoneyDeposit();
  			new PrintingServiceTest().testClientAssignDocuments();
@@ -381,6 +374,7 @@ class PrintingServiceTest
  			new PrintingServiceTest().testRemoveReport();
  			new PrintingServiceTest().testReports();
  			new PrintingServiceTest().testRedistributeDocumentQueue();
+ 			new PrintingServiceTest().testPrintWhileDamaged();
  			
  			-- Technician
  			new PrintingServiceTest().testFixPrinterProblem();

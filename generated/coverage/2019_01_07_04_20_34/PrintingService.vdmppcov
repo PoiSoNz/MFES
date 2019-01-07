@@ -1,9 +1,10 @@
 class PrintingService
+	/*
+		Defines the printing service that keeps of the system printers, and operations to decide to what printer the documents get sent to when they have to be printed
+	*/
 		
 	instance variables
 		public static servicePrinters: map Printer to char := {|->}; 
-
-		-- inv ;
 
 	operations
 		/*
@@ -74,7 +75,10 @@ class PrintingService
 				forall printer in set dom servicePrinters & document not in set elems printer.printingQueue
 			post
 				exists1 printer in set dom servicePrinters & document in set elems printer.printingQueue;
-				
+		
+		/*
+			Identify the printer in the same location has the one in the argument and transfer half of the documents in its printing queue to the printer received as argument
+		*/		
 		public static redistributeDocumentQueue: Printer ==> ()
 		redistributeDocumentQueue(printer) ==
 		(
@@ -97,7 +101,10 @@ class PrintingService
 		)
 			pre
 				printer in set dom servicePrinters;
-				
+		
+		/*
+			Get all the printers in a given location
+		*/		
 		private static getPrintersFromLocation: char ==> set of Printer
 		getPrintersFromLocation(location) ==
 			return dom (servicePrinters :> {location})
