@@ -325,16 +325,40 @@ class PrintingServiceTest
 			assertEqual(printer.paperQuantities(3), Utils`PAPER_REFILL_QUANTITY);
 			
 		);
+		
+		testPrintWhileDamaged: () ==> ()
+		testPrintWhileDamaged() ==
+		(			
+			dcl flag: bool := true;
+			
+			while flag do
+			(
+				dcl client: Client := new Client("Joao", 10);
+				dcl doc1: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+				dcl doc2: Document := new Document(<BlackWhite>, <A3>, 2, 5);
+				dcl printer: Printer := new Printer([50, 50], [50, 50, 50], 'a');
+				dcl ps: PrintingService := new PrintingService({printer});
 				
+				client.assignDocument(doc1);
+				client.assignDocument(doc2);
+				client.requestPrint(doc1);
+				client.requestPrint(doc2);
+				
+				flag := printer.printNext();
+				
+				if
+					printer.damaged
+				then
+				(
+					flag := printer.printNext();
+					assertEqual(printer.damaged, true);
+				)
+			)
+		);
+		
 		public static main: () ==> ()
  		main() ==
  		(
- 			--dcl test1: PrintingServiceTest := new PrintingServiceTest();
- 			--dcl test2: PrintingServiceTest := new PrintingServiceTest();
- 			--dcl test3: PrintingServiceTest := new PrintingServiceTest();
- 			--dcl test4: PrintingServiceTest := new PrintingServiceTest();
- 			--dcl test5: PrintingServiceTest := new PrintingServiceTest();
- 			
  			-- Client
  			new PrintingServiceTest().testClientMoneyDeposit();
  			new PrintingServiceTest().testClientAssignDocuments();
@@ -350,6 +374,7 @@ class PrintingServiceTest
  			new PrintingServiceTest().testRemoveReport();
  			new PrintingServiceTest().testReports();
  			new PrintingServiceTest().testRedistributeDocumentQueue();
+ 			new PrintingServiceTest().testPrintWhileDamaged();
  			
  			-- Technician
  			new PrintingServiceTest().testFixPrinterProblem();
