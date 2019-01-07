@@ -1,8 +1,5 @@
 class Technician
 	
-	values
-		private INK_REFILL_QUANTITY = 25;
-	
 	instance variables
 		private static id_count: nat := 1;
 		private id: nat;
