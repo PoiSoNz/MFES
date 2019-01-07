@@ -1,6 +1,6 @@
 class Document
 	/*
-		Represents a document that can be printed and possessed by clients
+		Defines a document with the resources required for its print
 	*/
 	
 	types
@@ -43,7 +43,11 @@ class Document
 				owner = nil and
 				price > 0 and
 				status = <NotPrinted>;
-				
+		
+		/*
+			Set document status as "queued"
+			A document can only be queued if it is "not printed"
+		*/		
 		public queued: () ==> ()
 		queued() ==
 			status := <Queued>
@@ -52,6 +56,10 @@ class Document
 			post
 				status = <Queued>;
 		
+		/*
+			Set document status as "printed"
+			A document can only be printed if it is "queued"
+		*/
 		public printed: () ==> ()
 		printed() ==
 			status := <Printed>
@@ -59,7 +67,11 @@ class Document
 				status = <Queued>
 			post
 				status = <Printed>;
-						
+		
+		/*
+			Set a client as the owner of the document
+			Once a client as been assigned, it cannot be changed
+		*/
 		public setOwner: Client ==> ()
 		setOwner(client) ==
 			owner := client
@@ -69,10 +81,17 @@ class Document
 				owner = client;
 				
 	functions
+		/*
+			Calculate a document based on its color paper size and paper quantity
+		*/
 		public static calculatePrice: ColorType * PaperSize * nat1 -> real
 		calculatePrice(color, size, paperQuantity) ==
 			sheetCost(size) * paperQuantity * colorCostFactor(color);
 		
+		/*
+			Return the cost factor to be multiplied to the final price
+			Black & White does not affect the final price, colored documents have price increased by 50%
+		*/
 		public static colorCostFactor: ColorType -> real
 		colorCostFactor(color) ==
 		(
@@ -81,7 +100,10 @@ class Document
 				<Color> -> 1.5
 			end
 		);
-			
+		
+		/*
+			Return the cost of each paper sheet depending on the paper size
+		*/
 		public static sheetCost: PaperSize -> real
 		sheetCost(sheetSize) ==
 		(

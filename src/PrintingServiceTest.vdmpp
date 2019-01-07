@@ -1,20 +1,9 @@
 class PrintingServiceTest
 	/*
-		Class responsible for testing the printing service system
+		Defines the test/usage scenarios and test cases for the Printing Service. Also defines assert true and assert equal testing functions
 	*/
 	
 	instance variables
-		-- Printers
-		p1: Printer := new Printer([50, 50], [50, 50, 50], 'a');
-		p2: Printer := new Printer([10, 10], [10, 10, 10], 'a');
-		p3: Printer := new Printer([3, 10], [3, 10, 50], 'b');
-		-- Documents
-		smallDocument: Document := new Document(<BlackWhite>, <A5>, 2, 5);
-		mediumDocument: Document := new Document(<Color>, <A4>, 5, 10);
-		bigDocument: Document := new Document(<BlackWhite>, <A3>, 10, 20);
-		-- Clients
-		--c1: Client := new Client("Joao");
-		--c2: Client := new Client("Miguel", 20);
 		
 	operations
 		private assertTrue: bool ==> ()

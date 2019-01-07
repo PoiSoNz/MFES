@@ -1,5 +1,7 @@
 class Report
-	
+	/*
+		Defines a report with the malfunction that occured on a given printer
+	*/
 	types
 		public MalfunctionType = <Damaged> | <BlackInkEmpty> | <ColorInkEmpty> |
 														<A3Empty> | <A4Empty> | <A5Empty>;
@@ -11,8 +13,6 @@ class Report
 		public printer: Printer;
 		public solverTechnician: [Technician] := nil;
 		public closed: bool := false;
-
-		--inv ;
 
 	operations
 		/*

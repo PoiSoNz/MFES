@@ -1,12 +1,13 @@
 class Technician
+	/*
+		Defines a technician capable of resolving the reported malfunctions
+	*/
 	
 	instance variables
 		private static id_count: nat := 1;
 		private id: nat;
 		private name: Utils`String;
 		private fixedReports: seq of Report := [];
-
-		--inv ;
 
 	operations
 		public Technician: Utils`String ==> Technician
@@ -21,7 +22,12 @@ class Technician
 				id_count = id_count~ + 1 and
 				id = id_count~ and
 				fixedReports = [];
-
+		
+		/*
+			Fixes a report's malfunction
+			If the malfunction is related to lack of resources, it refills the printer with the malfunction
+			If the malfunction is damage, it updates the printer's damaged variable to false
+		*/
 		public fixPrinterProblem: Report ==> ()
 		fixPrinterProblem(report) ==
 		(
@@ -43,7 +49,10 @@ class Technician
 				report.closed and
 				report in set elems fixedReports and
 				len fixedReports = len fixedReports~ + 1;
-
+		
+		/*
+			Updates the printer's damaged variable to false in order to solve the <Damaged> malfunction
+		*/
 		private fixDamage: Printer ==> ()
 		fixDamage(printer) ==
 			printer.repairDamage()
@@ -52,12 +61,18 @@ class Technician
 			post
 				not printer.damaged;
 				
+		/*
+			Refills a printer's type of ink
+		*/
 		private fixLackOfInk: Printer * nat1 ==> ()
 		fixLackOfInk(printer, inkCartridgeIndex) ==
 			printer.refillInkCartridge(Utils`INK_REFILL_QUANTITY, inkCartridgeIndex)
 			post
 				printer.inkQuantities(inkCartridgeIndex) >= Utils`INK_REFILL_QUANTITY;
-				
+		
+		/*
+			Refills a printer's type of paper
+		*/	
 		private fixLackOfPaper: Printer * nat1 ==> ()
 		fixLackOfPaper(printer, paperTypeIndex) ==
 			printer.refillPaperSize(Utils`PAPER_REFILL_QUANTITY, paperTypeIndex)
